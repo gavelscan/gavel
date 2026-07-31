@@ -105,3 +105,56 @@ class TestDecodeRejectsWrongLogs(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestLifecycleEventDecoders(unittest.TestCase):
+    """The four lifecycle events the topic-filtered v1 watcher missed."""
+
+    def _log(self, topic0, indexed, amount):
+        return {
+            "address": LBP_STRATEGY,
+            "topics": [topic0] + ["0x" + "00" * 12 + a for a in indexed],
+            "data": "0x" + "%064x" % amount,
+            "blockNumber": "0x64",
+            "transactionHash": "0x" + "cd" * 32,
+        }
+
+    def test_token_distributed(self):
+        from gavel.constants import TOPIC_TOKEN_DISTRIBUTED
+        from gavel.decode import decode_any
+        rec = decode_any(self._log(TOPIC_TOKEN_DISTRIBUTED,
+                                   ["11" * 20, "22" * 20], 1000))
+        self.assertEqual(rec["event"], "TokenDistributed")
+        self.assertEqual(rec["token"], "0x" + "11" * 20)
+        self.assertEqual(rec["strategy"], "0x" + "22" * 20)
+        self.assertEqual(rec["amount"], 1000)
+
+    def test_currency_swept(self):
+        from gavel.constants import TOPIC_CURRENCY_SWEPT
+        from gavel.decode import decode_any
+        rec = decode_any(self._log(TOPIC_CURRENCY_SWEPT, ["33" * 20], 7))
+        self.assertEqual(rec["event"], "CurrencySwept")
+        self.assertEqual(rec["recipient"], "0x" + "33" * 20)
+
+    def test_tokens_swept(self):
+        from gavel.constants import TOPIC_TOKENS_SWEPT
+        from gavel.decode import decode_any
+        rec = decode_any(self._log(TOPIC_TOKENS_SWEPT, ["44" * 20], 9))
+        self.assertEqual(rec["event"], "TokensSwept")
+        self.assertEqual(rec["amount"], 9)
+
+    def test_funds_recovered(self):
+        from gavel.constants import TOPIC_FUNDS_RECOVERED
+        from gavel.decode import decode_any
+        rec = decode_any(self._log(TOPIC_FUNDS_RECOVERED,
+                                   ["55" * 20, "66" * 20], 12))
+        self.assertEqual(rec["event"], "FundsRecovered")
+        self.assertEqual(rec["initializer"], "0x" + "55" * 20)
+        self.assertEqual(rec["recipient"], "0x" + "66" * 20)
+
+    def test_malformed_indexed_amount_becomes_decode_failed(self):
+        from gavel.constants import TOPIC_FUNDS_RECOVERED
+        from gavel.decode import decode_any
+        log = self._log(TOPIC_FUNDS_RECOVERED, ["55" * 20], 12)  # missing topic
+        rec = decode_any(log)
+        self.assertEqual(rec["event"], "DecodeFailed")
