@@ -200,3 +200,48 @@ class TestLoadEnv(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestJsonDirectiveDerivedFromSchema(unittest.TestCase):
+    """REGRESSION: a hand-written key list rotted after the schema
+    redesign, instructing models to emit the removed free-text fields."""
+
+    def test_directive_matches_current_schema(self):
+        from agent.schema import VERDICT_SCHEMA
+        directive = providers._json_directive()
+        for key in VERDICT_SCHEMA["required"]:
+            self.assertIn(key, directive)
+
+    def test_directive_has_no_stale_free_text_keys(self):
+        directive = providers._json_directive()
+        self.assertNotIn("headline", directive)
+        self.assertNotIn("reasons", directive)
+
+
+class TestExtractJsonRobustness(unittest.TestCase):
+    """REGRESSION: _extract_json leaked raw JSONDecodeError, returned
+    non-dicts, and discarded a valid object when prose contained braces."""
+
+    def test_braces_in_prose_does_not_discard_valid_object(self):
+        content = 'The schema needs {verdict, ...}. My answer: {"verdict": "FLAG"}'
+        self.assertEqual(_extract_json(content), {"verdict": "FLAG"})
+
+    def test_scalar_raises_model_error(self):
+        with self.assertRaises(ModelError):
+            _extract_json('"PASS"')
+
+    def test_array_raises_model_error(self):
+        with self.assertRaises(ModelError):
+            _extract_json('["PASS"]')
+
+    def test_truncated_json_raises_model_error(self):
+        with self.assertRaises(ModelError):
+            _extract_json('{"a": {"b": 1}, "c":')
+
+    def test_braces_inside_strings_ignored(self):
+        self.assertEqual(_extract_json('{"note": "a } brace", "verdict": "PASS"}'),
+                         {"note": "a } brace", "verdict": "PASS"})
+
+    def test_two_objects_returns_first_valid(self):
+        out = _extract_json('{"verdict": "PASS"} {"verdict": "FAIL"}')
+        self.assertIsInstance(out, dict)
