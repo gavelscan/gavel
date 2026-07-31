@@ -17,7 +17,7 @@ sentence, implemented.
 | 2 | Chain client — raw JSON-RPC, no indexer trust | `gavel/chain.py` | ✅ done |
 | 3 | Deterministic checks + verdict ceiling | `gavel/checks.py` | ✅ done |
 | 4 | Watcher — poll loop over new launches | `gavel/watch.py` | ✅ done, full history archived |
-| 5 | Judge — agent layer (see Agent spec) | `agent/` | ✅ done, 107 tests incl. adversarial |
+| 5 | Judge — agent layer (see Agent spec) | `agent/` | ✅ done, twice-reviewed, 155 tests |
 | 6 | Verdict card renderer + X posting | `card/` | ⬜ |
 | 7 | Static feed site (gavelscan.xyz) | `site/` | ⬜ last |
 
@@ -64,6 +64,19 @@ verdict enum, a subset of our own finding keys, and classification enums
 reaches the feed; the card layer renders human text from our
 deterministic strings. This structurally closes "injection makes GAVEL
 publish attacker copy" — there is no attacker-influenced text on the feed.
+
+**Fact-bounded assessments.** The classification enums are not taken on
+trust either — a second review found them to be the redesign's own new
+hole (a model could stamp "verified_official" on an impostor). Every
+assessment is reconciled against the facts (`derive_assessments`):
+fact-determined fields are *replaced* by the fact (recipient code/nonce
+decides contract vs fresh vs established EOA; a zero hook is "none";
+native ETH is "native_eth"), and genuinely judgmental fields are coerced
+into an allowed set (a nonzero hook can never be "none"). `verified_official`
+is not selectable at all until an issuer registry is wired — an
+unverifiable claim must never publish as verification. Any model answer
+contradicting the facts is recorded as a disagreement and itself raises
+the manipulation flag.
 Two more defenses back it: a per-call nonce fence around the evidence
 block (a forged `</EVIDENCE>` cannot close it), and a DETERMINISTIC
 injection scanner ORed into `manipulation_detected` so the flag cannot be
@@ -80,9 +93,7 @@ PASS.
    token vs impostor), using deployment provenance, not name matching.
 3. Whether recipient/deployer wallet history changes the risk picture
    (provenance clustering, serial-deployer patterns).
-4. The verdict prose: what a bidder should understand, in two sentences,
-   with every number traceable to the factsheet.
-5. Re-judging: verdicts update when on-chain state changes
+4. Re-judging: verdicts update when on-chain state changes
    (`Migrated` / `MigrationFailed` / auction progress) — an updated
    verdict card links its predecessor. Never silent edits.
 
@@ -93,9 +104,11 @@ PASS.
 - Output must validate against the verdict JSON schema; invalid → retry,
   then drop. The model cannot free-text its way onto the feed.
 - `clamp_verdict` applied after the model answers (I3).
-- Vocabulary deny-list on published text: no "buy", "sell", "gem",
-  "moon", "guaranteed", price predictions, or any imperative directed at
-  the reader's money. GAVEL describes launches; it never advises trades.
+- Assessment enums reconciled against the facts; disagreement raises the
+  manipulation flag (which in turn floors the verdict at FLAG).
+- Vocabulary deny-list and number guard on rendered card copy: no trade
+  advice, no figure that did not come from the factsheet. GAVEL describes
+  launches; it never advises trades.
 - Posting rate-limited; global kill switch via env flag; dry-run mode is
   the default until explicitly armed.
 - Every number in the card must exist in the factsheet. The model cites;
@@ -106,7 +119,7 @@ Deterministic factsheets can still be generated headless.
 
 ## Test plan
 
-Target bar: 107+ tests before the feed goes public. Current: 134.
+Target bar: 107+ tests before the feed goes public. Current: 155.
 
 - Unit: decoder edge cases, schedule/position/pool/recipient checks — ✅ started
 - Fixture: real HOTDOG/COST launch receipt (block 23898781) — ✅

@@ -42,6 +42,20 @@ a feature, not a weakness.
   key_findings must be members of our own factsheet. Each was turned into
   a regression test after a pre-commit adversarial review found the
   earlier free-text design bypassable.
+- **Model-authored labels.** Any field the model controls is a field an
+  attacker can try to steer. The verdict is clamped, and the assessment
+  enums are reconciled against the facts, so what remains steerable is
+  bounded: within a genuinely uncertain set (e.g. how hostile a custom
+  hook looks), never onto a claim the facts contradict. A disagreement
+  with the facts raises the manipulation flag rather than being silently
+  overridden.
+- **Injection detection is a detector, not a proof.** `injection_signal`
+  normalizes unicode, folds homoglyphs and collapses spacing, and treats
+  self-asserted trust claims ("audited", "verified") in a name field as
+  manipulation-shaped. It still cannot enumerate every phrasing. It is
+  deliberately not load-bearing on its own: the structural defenses (no
+  free text, fact-bounded assessments, clamp) are what make a missed
+  signal survivable.
 - **Model calibration.** The classification enums (currency/hook/recipient
   assessment) are the model's judgment and can be miscalibrated — e.g. a
   weaker model labelling a genuine stock token "likely_impostor" when it
