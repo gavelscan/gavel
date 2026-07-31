@@ -16,7 +16,7 @@ sentence, implemented.
 | 1 | Decoder — events + `MigratorParameters` structs | `gavel/decode.py` | ✅ done, verified vs live tx |
 | 2 | Chain client — raw JSON-RPC, no indexer trust | `gavel/chain.py` | ✅ done |
 | 3 | Deterministic checks + verdict ceiling | `gavel/checks.py` | ✅ done |
-| 4 | Watcher — poll loop over new launches | `gavel/watch.py` | ⬜ next |
+| 4 | Watcher — poll loop over new launches | `gavel/watch.py` | ✅ done, full history archived |
 | 5 | Judge — agent layer (see Agent spec) | `agent/` | ⬜ |
 | 6 | Verdict card renderer + X posting | `card/` | ⬜ |
 | 7 | Static feed site (gavelscan.xyz) | `site/` | ⬜ last |
@@ -86,7 +86,7 @@ Deterministic factsheets can still be generated headless.
 
 ## Test plan
 
-Target bar: 107+ tests before the feed goes public. Current: 42.
+Target bar: 107+ tests before the feed goes public. Current: 76.
 
 - Unit: decoder edge cases, schedule/position/pool/recipient checks — ✅ started
 - Fixture: real HOTDOG/COST launch receipt (block 23898781) — ✅
@@ -94,7 +94,7 @@ Target bar: 107+ tests before the feed goes public. Current: 42.
 - Adversarial (before judge goes live): prompt injection via token
   name/symbol/description; schema-escape attempts; verdict-raise attempts
   (must be clamped); deny-list bypass attempts.
-- Watcher: reorg handling, missed-range recovery, duplicate suppression.
+- Watcher: reorg lag, coverage-gap refusal, duplicate suppression (incl. intra-batch), torn-archive recovery, faithful getLogs fake — ✅
 - CI on every push once the repo is public.
 
 ## Demand gate (before ANY monetization / token / contracts)
@@ -107,7 +107,7 @@ written in the concept doc and are binding.
 
 - [x] Spec + invariants written
 - [x] Decoder + chain client + checks, tested (42 tests, fixture + live)
-- [ ] Watcher loop + launch archive (JSONL)
+- [x] Watcher loop + launch archive (JSONL) — 2,214 events, full LL history on RHC
 - [ ] Judge runtime + policy gates + adversarial tests (target: 107+ total)
 - [ ] Verdict card renderer (brand: slate/brass, PASS/FLAG/FAIL stamp)
 - [ ] X posting via @gavelscan (dry-run first, then armed)
