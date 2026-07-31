@@ -32,10 +32,17 @@ import requests
 from .schema import VERDICT_SCHEMA
 
 DEFAULT_ANTHROPIC_MODEL = "claude-opus-5"
-_JSON_DIRECTIVE = (
-    "\n\nReturn ONLY a single minified JSON object with exactly these keys: "
-    "verdict, headline, reasons, manipulation_detected. No prose, no code fences."
-)
+
+
+def _json_directive() -> str:
+    """Derive the key list from VERDICT_SCHEMA so the instruction can never
+    drift from the contract the validator enforces. A hand-written copy
+    silently rots the moment the schema changes — and the tempting fix
+    for the resulting failures is to loosen validation, which is exactly
+    the wrong direction."""
+    keys = ", ".join(VERDICT_SCHEMA["required"])
+    return ("\n\nReturn ONLY a single minified JSON object with exactly "
+            "these keys: %s. No other keys, no prose, no code fences." % keys)
 
 
 class ModelError(Exception):
@@ -61,28 +68,62 @@ def load_env(path: str = ".env") -> None:
 
 # -- JSON extraction ----------------------------------------------------------
 
-def _extract_json(content: str) -> dict:
-    """Parse a JSON object from a chat completion.
+def _balanced_objects(content: str):
+    """Yield every brace-balanced candidate object, longest-first per start.
 
-    Reasoning models sometimes wrap the answer in ``` fences or emit a
-    little prose around it. Try strict parse, then fenced, then the
-    outermost brace span. If none yields an object, raise — the judge
-    treats that as a failed attempt, never a guess.
+    Reasoning models emit prose that contains braces ("the schema needs
+    {verdict, ...}"), so a naive first-brace/last-brace span captures
+    garbage and discards a perfectly good answer. Scanning for balanced
+    spans (ignoring braces inside strings) finds the real object.
+    """
+    depth = 0
+    start = None
+    in_string = False
+    escape = False
+    for i, ch in enumerate(content):
+        if in_string:
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == '"':
+                in_string = False
+            continue
+        if ch == '"':
+            in_string = True
+        elif ch == "{":
+            if depth == 0:
+                start = i
+            depth += 1
+        elif ch == "}":
+            if depth:
+                depth -= 1
+                if depth == 0 and start is not None:
+                    yield content[start:i + 1]
+                    start = None
+
+
+def _extract_json(content: str) -> dict:
+    """Parse a JSON *object* from a chat completion.
+
+    Always returns a dict or raises ModelError — never a scalar, list, or
+    a raw JSONDecodeError, so the caller's contract holds and the judge
+    treats failures as retryable rather than crashing.
     """
     content = content.strip()
-    try:
-        return json.loads(content)
-    except json.JSONDecodeError:
-        pass
-    fence = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", content, re.DOTALL)
+    candidates = [content]
+    fence = re.search(r"```(?:json)?\s*(.+?)\s*```", content, re.DOTALL)
     if fence:
+        candidates.append(fence.group(1).strip())
+    candidates.extend(_balanced_objects(content))
+
+    for candidate in candidates:
         try:
-            return json.loads(fence.group(1))
+            parsed = json.loads(candidate)
         except json.JSONDecodeError:
-            pass
-    start, end = content.find("{"), content.rfind("}")
-    if 0 <= start < end:
-        return json.loads(content[start:end + 1])
+            continue
+        if isinstance(parsed, dict):
+            return parsed
     raise ModelError("no JSON object in model response")
 
 
@@ -125,7 +166,7 @@ def openai_compatible_model(system_prompt: str, user_prompt: str) -> dict:
         "model": model,
         "messages": [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt + _JSON_DIRECTIVE},
+            {"role": "user", "content": user_prompt + _json_directive()},
         ],
         "response_format": {"type": "json_object"},
         "temperature": 0,
