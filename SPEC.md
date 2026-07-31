@@ -17,7 +17,7 @@ sentence, implemented.
 | 2 | Chain client — raw JSON-RPC, no indexer trust | `gavel/chain.py` | ✅ done |
 | 3 | Deterministic checks + verdict ceiling | `gavel/checks.py` | ✅ done |
 | 4 | Watcher — poll loop over new launches | `gavel/watch.py` | ✅ done, full history archived |
-| 5 | Judge — agent layer (see Agent spec) | `agent/` | ⬜ |
+| 5 | Judge — agent layer (see Agent spec) | `agent/` | ✅ done, 107 tests incl. adversarial |
 | 6 | Verdict card renderer + X posting | `card/` | ⬜ |
 | 7 | Static feed site (gavelscan.xyz) | `site/` | ⬜ last |
 
@@ -50,6 +50,26 @@ gate passes.
   trivially provable because there is no path to money.
 
 ## Agent spec (the judge)
+
+**Model provider is configuration, not code.** The judge calls a model
+through a swappable adapter (`agent/providers.py`): Anthropic (native
+structured output) or any OpenAI-compatible endpoint (GLM / Kimi /
+DeepSeek / MiniMax via a router). Selected by env (`GAVEL_MODEL_PROVIDER`).
+The safety gates live outside the model, so provider choice never
+weakens an invariant — a weaker or hostile model is bounded identically.
+
+**No free-text egress (post-review redesign).** The model returns only a
+verdict enum, a subset of our own finding keys, and classification enums
+(hook / currency / recipient assessments). It authors no prose that
+reaches the feed; the card layer renders human text from our
+deterministic strings. This structurally closes "injection makes GAVEL
+publish attacker copy" — there is no attacker-influenced text on the feed.
+Two more defenses back it: a per-call nonce fence around the evidence
+block (a forged `</EVIDENCE>` cannot close it), and a DETERMINISTIC
+injection scanner ORed into `manipulation_detected` so the flag cannot be
+silenced by the same injection it is meant to catch. `manipulation_detected`
+is coupled to the verdict: a launch flagged manipulative can never publish
+PASS.
 
 **Autonomous decisions the judge makes:**
 1. Whether a nonzero hook's *economic* behavior is hostile (reads source
@@ -86,14 +106,14 @@ Deterministic factsheets can still be generated headless.
 
 ## Test plan
 
-Target bar: 107+ tests before the feed goes public. Current: 76.
+Target bar: 107+ tests before the feed goes public. Current: 134.
 
 - Unit: decoder edge cases, schedule/position/pool/recipient checks — ✅ started
 - Fixture: real HOTDOG/COST launch receipt (block 23898781) — ✅
 - Fork: factsheet build against live RHC mainnet state — ✅ (`scripts/dry_run.py`)
-- Adversarial (before judge goes live): prompt injection via token
-  name/symbol/description; schema-escape attempts; verdict-raise attempts
-  (must be clamped); deny-list bypass attempts.
+- Adversarial (judge): prompt injection via token name/symbol/currency;
+  schema-escape; verdict-raise attempts forced down by clamp; deny-list
+  and digit-gate bypass; fail-closed on model transport failure — ✅
 - Watcher: reorg lag, coverage-gap refusal, duplicate suppression (incl. intra-batch), torn-archive recovery, faithful getLogs fake — ✅
 - CI on every push once the repo is public.
 
@@ -108,7 +128,8 @@ written in the concept doc and are binding.
 - [x] Spec + invariants written
 - [x] Decoder + chain client + checks, tested (42 tests, fixture + live)
 - [x] Watcher loop + launch archive (JSONL) — 2,214 events, full LL history on RHC
-- [ ] Judge runtime + policy gates + adversarial tests (target: 107+ total)
+- [x] Judge runtime + policy gates + adversarial tests (107 tests total)
+- [x] Model provider adapter (Anthropic + OpenAI-compatible/GLM), env-selected
 - [ ] Verdict card renderer (brand: slate/brass, PASS/FLAG/FAIL stamp)
 - [ ] X posting via @gavelscan (dry-run first, then armed)
 - [ ] Static feed on gavelscan.xyz
