@@ -75,18 +75,60 @@ def text_violations(text: str) -> List[str]:
 
 # --- deterministic injection detection (load-bearing) -----------------------
 
+# Instruction-shaped content: an attacker telling the judge what to do.
 _INJECTION_MARKERS = (
-    "ignore previous", "ignore all previous", "disregard", "system:",
-    "assistant:", "you are", "verdict", "manipulation_detected",
-    "instruction", "<<evidence", "end evidence", "</evidence", "<evidence",
-    "prompt", "override", "retraction", "prior evidence",
+    "ignore previous", "ignore all", "disregard", "system:", "assistant:",
+    "you are", "verdict", "manipulation", "instruction", "evidence",
+    "prompt", "override", "retraction", "prior", "respond with",
+    "reply with", "output", "classify", "rate this", "mark as", "treat this",
+    "note to", "reviewer", "judge",
 )
+
+# Trust-claim content: an attacker asserting legitimacy in a field that is
+# supposed to be a name. A token cannot vouch for itself, so any of this in
+# a name/symbol is manipulation-shaped even without an imperative.
+_TRUST_CLAIM_MARKERS = (
+    "audited", "audit by", "certik", "verified", "official", "legitimate",
+    "endorsed", "approved", "safe", "trusted", "kyc", "no rug", "renounced",
+    "benign", "authentic", "genuine", "partnership",
+)
+
+# Homoglyph folding: Cyrillic/Greek lookalikes that survive NFKC.
+_HOMOGLYPHS = str.maketrans({
+    "а": "a", "е": "e", "о": "o", "р": "p", "с": "c",
+    "х": "x", "у": "y", "і": "i", "ј": "j", "һ": "h",
+    "ο": "o", "α": "a", "ε": "e", "ρ": "p", "ν": "v",
+})
+
+MAX_NAME_LEN = 96
+
+
+def _normalize(text: str) -> str:
+    """Fold the evasions that keep a string legible to a model while
+    hiding it from a naive substring scan: compatibility forms
+    (fullwidth), homoglyphs, and inserted separators."""
+    folded = unicodedata.normalize("NFKC", text).lower().translate(_HOMOGLYPHS)
+    # Collapse separator-spaced text ("i g n o r e" -> "ignore") while
+    # keeping a spaced copy so multi-word markers still match.
+    collapsed = re.sub(r"[\s._\-*|]+", "", folded)
+    spaced = re.sub(r"\s+", " ", folded)
+    return spaced + " " + collapsed
 
 
 def injection_signal(factsheet: dict) -> List[str]:
     """Scan attacker-controlled strings for injection-shaped content.
+
     Deterministic and independent of the model, so an injection that
-    silences the model's own flag cannot silence this one."""
+    silences the model's own flag cannot silence this one. Normalization
+    is applied first, because an evasion that defeats this scan is only
+    useful to an attacker if the model still reads it as instructions —
+    and NFKC/homoglyph/spacing folding covers exactly that gap.
+
+    This is a detector, not a proof: it raises the cost of a silent
+    injection, it does not eliminate the class. The structural defenses
+    (no free text, fact-bounded assessments, clamp) are what make a
+    missed signal survivable.
+    """
     signals = []
     currency = factsheet.get("currency", {}) or {}
     candidates = [
@@ -96,14 +138,23 @@ def injection_signal(factsheet: dict) -> List[str]:
     for label, value in candidates:
         if not isinstance(value, str):
             continue
-        low = value.lower()
+        haystack = _normalize(value)
         for marker in _INJECTION_MARKERS:
-            if marker in low:
-                signals.append("%s contains %r" % (label, marker))
-        if "\n" in value or "\r" in value:
-            signals.append("%s contains a newline" % label)
-        if len(value) > 96:
+            if marker in haystack or marker.replace(" ", "") in haystack:
+                signals.append("%s contains instruction marker %r" % (label, marker))
+        for marker in _TRUST_CLAIM_MARKERS:
+            if marker in haystack or marker.replace(" ", "") in haystack:
+                signals.append("%s contains self-asserted trust claim %r"
+                               % (label, marker))
+        if any(c in value for c in "\n\r\t"):
+            signals.append("%s contains a control character" % label)
+        if len(value) > MAX_NAME_LEN:
             signals.append("%s abnormally long (%d chars)" % (label, len(value)))
+        if unicodedata.normalize("NFKC", value) != value:
+            signals.append("%s uses non-canonical unicode forms" % label)
+        if any(ord(c) > 0x7F and unicodedata.category(c).startswith("L")
+               for c in value.translate(_HOMOGLYPHS)):
+            signals.append("%s mixes non-ASCII letters" % label)
     return signals
 
 
