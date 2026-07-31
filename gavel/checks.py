@@ -156,6 +156,54 @@ def check_currency(rpc: Rpc, currency: str) -> dict:
 
 # -- assembly -----------------------------------------------------------------
 
+def derive_assessments(factsheet: dict) -> dict:
+    """Fact-determined values and allowed sets for the judge's assessments.
+
+    Same discipline as the verdict ceiling, applied to the classification
+    labels: whatever the facts decide, the facts decide — the model does
+    not get to relabel a fresh EOA as "established" or an unverified
+    ERC20 as "verified_official". Where the facts genuinely run out (the
+    economic behavior of a custom hook), the model chooses freely inside
+    a bounded set.
+
+    Returns {field: {"fixed": value} | {"allowed": (…)}}.
+    """
+    p = factsheet["launch"]["params"]
+    recipient = factsheet["recipient"]
+    currency = factsheet["currency"]
+
+    # Recipient: fully determined by code size and history.
+    if recipient["code_size"] > 0:
+        recipient_rule = {"fixed": "contract"}
+    elif recipient["nonce"] == 0:
+        recipient_rule = {"fixed": "fresh_eoa"}
+    else:
+        recipient_rule = {"fixed": "established_eoa"}
+
+    # Hook: "none" is a fact, not an opinion. A nonzero hook is a genuine
+    # judgment call, but it can never be called "none".
+    if p["pool"]["hook"] == ZERO_ADDRESS:
+        hook_rule = {"fixed": "none"}
+    else:
+        hook_rule = {"allowed": ("benign", "suspicious", "hostile", "unknown")}
+
+    # Currency: native ETH is a fact. For an ERC20, "verified_official"
+    # requires membership in a trusted issuer registry we control. No
+    # registry is wired yet, so that label is not selectable — an
+    # unverifiable claim must never be published as verification.
+    if currency.get("kind") == "native_eth":
+        currency_rule = {"fixed": "native_eth"}
+    else:
+        currency_rule = {"allowed": ("plausible", "unverified",
+                                     "likely_impostor", "unknown")}
+
+    return {
+        "recipient_assessment": recipient_rule,
+        "hook_assessment": hook_rule,
+        "currency_assessment": currency_rule,
+    }
+
+
 def build_factsheet(rpc: Rpc, launch: dict, current_block: Optional[int] = None) -> dict:
     """All deterministic facts for one InitializerCreated launch record."""
     p = launch["params"]

@@ -22,13 +22,16 @@ if no attempt passes, no verdict is produced (I4 — stay silent).
 
 from typing import Callable, Optional
 
-from gavel.checks import FLAG, clamp_verdict, worse
+from gavel.checks import FLAG, clamp_verdict, derive_assessments, worse
 
 from .policy import injection_signal
 from .prompts import SYSTEM_PROMPT, build_user_prompt
 from .schema import validate_verdict
 
 MAX_ATTEMPTS = 3
+
+ASSESSMENT_FIELDS = ("hook_assessment", "currency_assessment",
+                     "recipient_assessment")
 
 
 class JudgeError(Exception):
@@ -47,6 +50,35 @@ def _finding_names(factsheet: dict) -> set:
     return {name for name, _, _ in factsheet["findings"]}
 
 
+def _reconcile_assessments(answer: dict, rules: dict):
+    """Bound the model's classification labels by the facts.
+
+    A fact-determined field is replaced with the fact — the model does
+    not get to relabel a fresh EOA "established" or an unverifiable ERC20
+    "verified_official". A bounded field is coerced to "unknown" if the
+    model picks outside the allowed set. Every override is returned as a
+    disagreement: a model contradicting plain on-chain facts is itself a
+    manipulation signal.
+
+    Returns (assessments, disagreements).
+    """
+    assessments, disagreements = {}, []
+    for field in ASSESSMENT_FIELDS:
+        claimed = answer[field]
+        rule = rules[field]
+        if "fixed" in rule:
+            resolved = rule["fixed"]
+        elif claimed in rule["allowed"]:
+            resolved = claimed
+        else:
+            resolved = "unknown"
+        if resolved != claimed:
+            disagreements.append("%s: model said %r, facts give %r"
+                                 % (field, claimed, resolved))
+        assessments[field] = resolved
+    return assessments, disagreements
+
+
 def judge_factsheet(factsheet: dict, model: Optional[ModelFn] = None) -> dict:
     """Produce a gated, clamped structured verdict for one factsheet.
 
@@ -61,6 +93,7 @@ def judge_factsheet(factsheet: dict, model: Optional[ModelFn] = None) -> dict:
     user_prompt = build_user_prompt(factsheet)
     valid_names = _finding_names(factsheet)
     det_injection = injection_signal(factsheet)
+    rules = derive_assessments(factsheet)
 
     last_error = "no attempts made"
     for _ in range(MAX_ATTEMPTS):
@@ -82,26 +115,30 @@ def judge_factsheet(factsheet: dict, model: Optional[ModelFn] = None) -> dict:
             last_error = "key_findings not in factsheet: %s" % unknown
             continue
 
+        assessments, disagreements = _reconcile_assessments(answer, rules)
+
         clamped = clamp_verdict(answer["verdict"], ceiling)
-        manipulation = bool(answer["manipulation_detected"]) or bool(det_injection)
+        manipulation = (bool(answer["manipulation_detected"])
+                        or bool(det_injection)
+                        or bool(disagreements))
         # A launch flagged as manipulative can never be published PASS.
         final = worse(clamped, FLAG) if manipulation else clamped
 
-        return {
+        result = {
             "verdict": final,
             "model_verdict": answer["verdict"],
             "ceiling": ceiling,
             "clamped": final != answer["verdict"],
             "key_findings": answer["key_findings"],
-            "hook_assessment": answer["hook_assessment"],
-            "currency_assessment": answer["currency_assessment"],
-            "recipient_assessment": answer["recipient_assessment"],
             "manipulation_detected": manipulation,
             "manipulation_model": bool(answer["manipulation_detected"]),
             "manipulation_deterministic": det_injection,
+            "assessment_disagreements": disagreements,
             "tx": factsheet["launch"]["tx"],
             "initializer": factsheet["launch"]["initializer"],
         }
+        result.update(assessments)
+        return result
 
     raise JudgeError("no publishable verdict after %d attempts: %s"
                      % (MAX_ATTEMPTS, last_error))
