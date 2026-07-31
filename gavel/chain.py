@@ -35,6 +35,8 @@ class Rpc:
                 body = resp.json()
                 if "error" in body:
                     raise RpcError("%s: %s" % (method, body["error"]))
+                if "result" not in body:
+                    raise RpcError("%s: malformed response (no result, no error)" % method)
                 return body["result"]
             except (requests.RequestException, json.JSONDecodeError) as e:
                 last_err = e
@@ -59,8 +61,10 @@ class Rpc:
     def eth_call(self, to: str, data: str) -> str:
         return self.call("eth_call", [{"to": to, "data": data}, "latest"])
 
-    def get_logs(self, address: str, topics: List[Optional[str]],
+    def get_logs(self, address, topics: List[Any],
                  from_block: int, to_block: int) -> list:
+        """address may be a single address or a list; topics follows the
+        eth_getLogs positional-OR convention (a list at a position ORs)."""
         return self.call("eth_getLogs", [{
             "address": address,
             "topics": topics,
