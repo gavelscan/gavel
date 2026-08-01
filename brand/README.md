@@ -12,6 +12,13 @@ derived from it mechanically — nothing is redrawn.
 | `gavel-mark-{512,256,128,64,48,32,16}.png` | Rasterised sizes from the tight crop |
 | `favicon.ico` | Multi-resolution icon (16/32/48) |
 | `preview.html` | Size and background test sheet |
+| `banner.png` | X header, 1500×500 — tagline with a vertical citation tick |
+| `banner-alt-mark-rules.png` | Alternate header: mark + tagline, flanking rules |
+| `banner-alt-mark-corners.png` | Alternate header: mark + tagline, corner registration marks |
+
+Banners are composed so the lockup is exactly centred and stays clear of
+both the profile-photo overlap (bottom left) and the ~9% each side that
+phones crop.
 
 Brass, read from the master's pixels: **`#B98D2B`**.
 Slate `#0E1113`. Verdict colours: PASS `#2E7D4F`, FAIL `#B3372F`,
