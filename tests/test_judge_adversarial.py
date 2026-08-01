@@ -27,7 +27,8 @@ from gavel.checks import FAIL, FLAG, PASS  # noqa: E402
 
 
 def factsheet(ceiling=PASS, findings=None, currency_name="Wrapped Ether",
-              currency_symbol="WETH", recipient_code=100):
+              currency_symbol="WETH", recipient_code=100,
+              registry_status="non_member"):
     return {
         "launch": {
             "tx": "0x" + "cd" * 32,
@@ -48,7 +49,8 @@ def factsheet(ceiling=PASS, findings=None, currency_name="Wrapped Ether",
         "recipient": {"address": "0x" + "22" * 20, "code_size": recipient_code,
                       "nonce": 5, "balance_wei": 10},
         "currency": {"kind": "erc20", "symbol": currency_symbol, "name": currency_name,
-                     "code_size": 200, "findings": []},
+                     "code_size": 200, "official": False,
+                     "registry_status": registry_status, "findings": []},
         "token_total_supply": 1000,
         "reserved_lp_ratio": 0.5,
         "current_block": 150,
@@ -386,18 +388,29 @@ class TestAssessmentReconciliation(unittest.TestCase):
         self.assertNotEqual(out["currency_assessment"], "verified_official")
 
     def test_registry_claim_without_backing_is_fixed_impostor(self):
-        # Claims the official name, not in the registry (official flag off):
-        # a fixed impostor call, and the model cannot soften it.
-        fs = factsheet(ceiling=FAIL, currency_name="Costco Robinhood Token")
+        # Claims the official name, and the registry WAS readable and does
+        # not contain it: a fixed impostor call the model cannot soften.
+        fs = factsheet(ceiling=FAIL, currency_name="Costco Robinhood Token",
+                       registry_status="non_member")
         out = judge_factsheet(fs, model=model_returning(
             {**GOOD, "verdict": FAIL, "currency_assessment": "plausible"}))
         self.assertEqual(out["currency_assessment"], "likely_impostor")
+
+    def test_unreadable_registry_does_not_accuse(self):
+        # I5: an unusable registry is unknown, not evidence of forgery. The
+        # impostor label must NOT be fixed when we could not check.
+        fs = factsheet(ceiling=FLAG, currency_name="Costco Robinhood Token",
+                       registry_status="unknown")
+        out = judge_factsheet(fs, model=model_returning(
+            {**GOOD, "verdict": FLAG, "currency_assessment": "unknown"}))
+        self.assertNotEqual(out["currency_assessment"], "likely_impostor")
 
     def test_official_registry_currency_fixed_verified(self):
         # official flag set (address in the RHJ registry): verified_official
         # is a fact, and a hostile model saying "impostor" cannot lower it.
         fs = factsheet(ceiling=PASS)
         fs["currency"] = {"kind": "erc20", "official": True,
+                          "registry_status": "member",
                           "name": "Costco • Robinhood Token", "symbol": "COST",
                           "findings": []}
         out = judge_factsheet(fs, model=model_returning(

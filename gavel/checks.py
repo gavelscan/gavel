@@ -10,10 +10,9 @@ language model having a good day.
 Verdict ordering: PASS > FLAG > FAIL.
 """
 
-import json
-import os
 from typing import Optional
 
+from . import registry
 from .chain import Rpc
 from .constants import (
     DYNAMIC_FEE_FLAG,
@@ -28,22 +27,12 @@ from .constants import (
 PASS, FLAG, FAIL = "PASS", "FLAG", "FAIL"
 _ORDER = {PASS: 2, FLAG: 1, FAIL: 0}
 
-# Official RHJ stock-token registry (chain 4663), cached from
-# api.robinhood.com/rhj/assets. Membership makes "official stock token" a
-# FACT rather than a name-pattern guess — an impostor can copy the name
-# "Costco • Robinhood Token" but cannot land on the real address.
-_REGISTRY_PATH = os.path.join(os.path.dirname(__file__), "rhj_registry.json")
-
-
-def _load_registry() -> dict:
-    try:
-        with open(_REGISTRY_PATH) as f:
-            return {k.lower(): v for k, v in json.load(f).items()}
-    except (OSError, ValueError):
-        return {}
-
-
-RHJ_REGISTRY = _load_registry()
+# Official RHJ stock-token registry (chain 4663). Membership makes
+# "official stock token" a FACT rather than a name-pattern guess — an
+# impostor can copy the name "Costco • Robinhood Token" but cannot land on
+# the registered address. See gavel/registry.py for the three-state
+# contract: an unusable cache yields UNKNOWN, never "not official".
+RHJ_REGISTRY = registry.load()
 
 
 def worse(a: str, b: str) -> str:
@@ -150,13 +139,15 @@ def check_currency(rpc: Rpc, currency: str) -> dict:
     (real RHJ stock token vs impostor) belongs to the judge, not here."""
     if currency == ZERO_ADDRESS:
         return {"kind": "native_eth", "official": False, "findings": []}
-    official = RHJ_REGISTRY.get(currency.lower())
+    reg_status = RHJ_REGISTRY.status(currency)
+    official = RHJ_REGISTRY.get(currency)
     facts = {
         "kind": "erc20",
         "symbol": rpc.read_string(currency, Rpc.SEL_SYMBOL),
         "name": rpc.read_string(currency, Rpc.SEL_NAME),
         "code_size": rpc.get_code_size(currency),
-        "official": official is not None,
+        "official": reg_status == registry.MEMBER,
+        "registry_status": reg_status,
         "official_symbol": official["symbol"] if official else None,
         "findings": [],
     }
@@ -172,12 +163,19 @@ def check_currency(rpc: Rpc, currency: str) -> dict:
             % official["symbol"],
         ))
     elif name.endswith("Robinhood Token"):
-        # Claims the name but the address is NOT registered — the exact
-        # impostor shape.
-        facts["findings"].append((
-            "currency_impostor_claim", FAIL,
-            "currency name claims an official Robinhood stock token, but its address is not in the registry",
-        ))
+        if reg_status == registry.NON_MEMBER:
+            # Claims the name but the address is NOT registered — the
+            # impostor shape, and this is an accusation we can stand behind
+            # only because the registry was actually readable.
+            facts["findings"].append((
+                "currency_impostor_claim", FAIL,
+                "currency name claims an official Robinhood stock token, but its address is not in the registry",
+            ))
+        else:
+            facts["findings"].append((
+                "currency_registry_unavailable", FLAG,
+                "currency claims an official Robinhood stock token, but the issuer registry could not be read to confirm it",
+            ))
     else:
         facts["findings"].append((
             "currency_nonstandard", FLAG,
@@ -228,7 +226,8 @@ def derive_assessments(factsheet: dict) -> dict:
         currency_rule = {"fixed": "native_eth"}
     elif currency.get("official"):
         currency_rule = {"fixed": "verified_official"}
-    elif name.endswith("Robinhood Token"):
+    elif (name.endswith("Robinhood Token")
+          and currency.get("registry_status") == registry.NON_MEMBER):
         currency_rule = {"fixed": "likely_impostor"}
     else:
         currency_rule = {"allowed": ("plausible", "unverified",

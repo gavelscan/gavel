@@ -61,10 +61,13 @@ a feature, not a weakness.
   makes "official stock token" a fact of registered address, not a name
   pattern: a currency in the registry is fixed to verified_official, a
   name that claims the official pattern from an unregistered address is
-  fixed to likely_impostor, and neither can be moved by the model. Residual
-  risk: the cached registry can go stale between refreshes, so a token
-  registered after the last fetch reads as unknown rather than official —
-  fail-open toward caution, never toward a false verified badge.
+  fixed to likely_impostor, and neither can be moved by the model. The
+  loader is deliberately three-state: a missing or corrupt cache yields
+  UNKNOWN, never "not official", so an infrastructure failure can never be
+  turned into an accusation of forgery (I5). Residual risk: a cache that
+  is merely stale still reads as current, so a token registered after the
+  last refresh reads as non-member — which downgrades a genuine launch to
+  a flag rather than granting a false verified badge.
 - **Judgment error.** The judge will sometimes read a hook wrong.
   Mitigation: verdicts carry reasoning + evidence links so readers can
   disagree; FLAG exists precisely so uncertainty is never rounded up to

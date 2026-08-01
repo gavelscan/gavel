@@ -122,7 +122,7 @@ Deterministic factsheets can still be generated headless.
 
 ## Test plan
 
-Target bar: 107+ tests before the feed goes public. Current: 167.
+Target bar: 107+ tests before the feed goes public. Current: 172.
 
 - Unit: decoder edge cases, schedule/position/pool/recipient checks — ✅ started
 - Fixture: real HOTDOG/COST launch receipt (block 23898781) — ✅
