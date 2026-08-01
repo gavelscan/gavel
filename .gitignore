@@ -9,3 +9,6 @@ site-data-launches.json
 .DS_Store
 logs/
 
+# Local editor/agent scratch: a dev-server config is useful to have but
+# is not part of the product.
+site/.claude/
