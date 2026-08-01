@@ -20,6 +20,12 @@ const ENTRIES: Entry[] = [
   {
     date: "2026-08-01",
     kind: "correction",
+    head: "The header showed a live block number over a snapshot",
+    body: "The chip in the header reported the chain's current height, which read as a promise that the record was keeping pace with it. It was not: these pages are rebuilt from a snapshot, and that snapshot can be an hour or more behind. The chip now reports the block the data was actually read at and how far behind the chain that leaves it, and turns amber once the gap is wide enough to matter.",
+  },
+  {
+    date: "2026-08-01",
+    kind: "correction",
     head: "A genuine stock token was being called a likely impostor",
     body: "Currency authenticity was inferred from the token's name, so an auction priced in a real Robinhood stock token could be labelled a likely impostor purely because nothing verified the claim. The official issuer registry for chain 4663 is now consulted as fact: a registered address is verified, a name that claims the official pattern from an unregistered address is an impostor, and neither can be moved by the judge. Where the registry cannot be read at all, the answer is unknown — an unreachable registry is not evidence of forgery.",
   },

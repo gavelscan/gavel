@@ -15,6 +15,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { FEED } from "@/lib/feed";
 
 const RPC = "https://rpc.mainnet.chain.robinhood.com";
 
@@ -71,28 +72,68 @@ function useBlockHeight() {
     };
   }, []);
 
-  const label = failed
-    ? "CHAIN UNREACHABLE"
-    : block === null
-      ? "READING CHAIN…"
-      : `BLOCK ${block.toLocaleString("en-US")}`;
-
-  return { label, failed, pending: block === null && !failed };
+  return { block, failed, pending: block === null && !failed };
 }
 
+/* Blocks are sub-second on this chain; this is only used to phrase a gap
+   in human terms, and it is always shown next to the raw block numbers. */
+const SECONDS_PER_BLOCK = 0.25;
+
+function age(blocks: number) {
+  const m = Math.round((blocks * SECONDS_PER_BLOCK) / 60);
+  if (m < 1) return "current";
+  if (m < 60) return `${m} min behind`;
+  const h = Math.round(m / 60);
+  return h < 48 ? `${h} h behind` : `${Math.round(h / 24)} d behind`;
+}
+
+/**
+ * Freshness, not liveness.
+ *
+ * Showing the live chain head alone was quietly misleading: the pages are
+ * built from a snapshot, so a reader saw a number ticking up and assumed
+ * the record was keeping pace with it. The chip now reports the block the
+ * DATA was read at and how far behind the chain that leaves it, and turns
+ * amber once the gap is wide enough to matter.
+ */
 function BlockChip({ className = "" }: { className?: string }) {
-  const { label, failed, pending } = useBlockHeight();
+  const { block, failed, pending } = useBlockHeight();
+  const gap = block === null ? null : Math.max(0, block - FEED.head);
+  const stale = gap !== null && gap > 7200; // ~30 minutes
+
+  const label = failed
+    ? "CHAIN UNREACHABLE"
+    : pending
+      ? `DATA AT ${FEED.head.toLocaleString("en-US")}`
+      : `DATA AT ${FEED.head.toLocaleString("en-US")} · ${age(gap!)}`;
+
+  const tone = failed
+    ? "var(--fail)"
+    : stale
+      ? "var(--brass)"
+      : "var(--ink-soft)";
+
   return (
     <span
       className={`data inline-flex items-center gap-2 text-[11px] tracking-[0.14em] ${className}`}
-      style={{ color: failed ? "var(--fail)" : "var(--ink-soft)" }}
-      title={failed ? "Could not reach a Robinhood Chain RPC" : undefined}
+      style={{ color: tone }}
+      title={
+        failed
+          ? "Could not reach a Robinhood Chain RPC"
+          : block === null
+            ? undefined
+            : `Chain head ${block.toLocaleString("en-US")}; this build was read at ${FEED.head.toLocaleString("en-US")}`
+      }
     >
       <span
         aria-hidden
         className="block h-[6px] w-[6px] rounded-full"
         style={{
-          background: failed ? "var(--fail)" : "var(--pass)",
+          background: failed
+            ? "var(--fail)"
+            : stale
+              ? "var(--brass)"
+              : "var(--pass)",
           opacity: pending ? 0.4 : 1,
         }}
       />
