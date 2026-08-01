@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Newsreader, Instrument_Sans, JetBrains_Mono } from "next/font/google";
+import Cursor from "@/components/Cursor";
 import Nav from "@/components/Nav";
 import "./globals.css";
 
@@ -51,6 +52,7 @@ export default function RootLayout({
       className={`${newsreader.variable} ${instrument.variable} ${mono.variable} h-full`}
     >
       <body className="min-h-full">
+        <Cursor />
         <Nav />
         {children}
       </body>

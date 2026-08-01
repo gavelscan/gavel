@@ -112,77 +112,88 @@ body {
    side, and a vignette so the sheet reads as a sheet instead of a fill. */
 .bg-paper-warm {
   background:
-    radial-gradient(120% 90% at 88% -12%, rgba(154, 116, 32, 0.16), transparent 56%),
-    radial-gradient(95% 75% at -12% 108%, rgba(154, 116, 32, 0.11), transparent 52%),
-    radial-gradient(140% 100% at 50% 50%, transparent 42%, rgba(70, 58, 38, 0.09) 100%),
-    linear-gradient(168deg, var(--paper-raised) 0%, var(--paper) 55%, var(--paper-sunk) 100%);
+    radial-gradient(70% 55% at 84% 18%, rgba(154, 116, 32, 0.15), transparent 70%),
+    radial-gradient(60% 50% at 8% 82%, rgba(154, 116, 32, 0.1), transparent 70%),
+    radial-gradient(85% 60% at 50% 50%, transparent 45%, rgba(70, 58, 38, 0.06) 92%, transparent 100%),
+    var(--paper);
 }
 
 /* The lamp moved to the other side, so consecutive sheets never repeat. */
 .bg-paper-sunk-warm {
   background:
-    radial-gradient(110% 80% at 8% -14%, rgba(154, 116, 32, 0.14), transparent 54%),
-    radial-gradient(130% 95% at 50% 55%, transparent 45%, rgba(70, 58, 38, 0.08) 100%),
-    linear-gradient(192deg, var(--paper-sunk) 0%, var(--paper) 60%, var(--paper-raised) 100%);
+    radial-gradient(65% 55% at 12% 20%, rgba(154, 116, 32, 0.13), transparent 70%),
+    radial-gradient(70% 55% at 88% 80%, rgba(154, 116, 32, 0.09), transparent 70%),
+    radial-gradient(90% 65% at 50% 50%, rgba(70, 58, 38, 0.05) 0%, transparent 75%),
+    var(--paper);
 }
 
 /* Instrument dark: slate lit from below by a brass horizon. */
 .bg-slate-glow {
   background:
-    radial-gradient(90% 75% at 50% 118%, rgba(203, 161, 58, 0.2), transparent 60%),
-    radial-gradient(60% 45% at 84% -10%, rgba(203, 161, 58, 0.09), transparent 55%),
-    linear-gradient(180deg, #17130e 0%, #1d1811 58%, #14100c 100%);
+    radial-gradient(75% 55% at 50% 100%, rgba(203, 161, 58, 0.18), transparent 72%),
+    radial-gradient(50% 40% at 86% 8%, rgba(203, 161, 58, 0.08), transparent 70%),
+    var(--slate);
 }
 
 /* Footer continues exactly where the dark section leaves off, so the
    two dark rooms read as one space with the lamp lower down. */
 .bg-slate-glow-deep {
   background:
-    radial-gradient(85% 70% at 50% 122%, rgba(203, 161, 58, 0.26), transparent 62%),
-    linear-gradient(180deg, #14100c 0%, #1a150f 58%, #100d09 100%);
+    radial-gradient(80% 60% at 50% 104%, rgba(203, 161, 58, 0.24), transparent 74%),
+    var(--slate);
 }
 
 /* Bridges: no more walls between dark and paper. The stops walk through
    a warm grey so the crossfade reads as light falling off, not a stripe. */
 .bridge-dark-to-paper {
-  height: 16rem;
+  height: 18rem;
+  margin-bottom: -1px;
   background: linear-gradient(
     180deg,
     #17130e 0.0%,
-    #1a1610 7.1%,
-    #221d16 14.3%,
-    #302a20 21.4%,
-    #423a2e 28.6%,
-    #574e3f 35.7%,
-    #6d6453 42.9%,
+    #19150f 5.6%,
+    #1e1913 11.1%,
+    #262119 16.7%,
+    #322c22 22.2%,
+    #3f382c 27.8%,
+    #4f4739 33.3%,
+    #615848 38.9%,
+    #736958 44.4%,
     #857b69 50.0%,
-    #9c937f 57.1%,
-    #b2a996 64.3%,
-    #c5bcaa 71.4%,
-    #d4cdbc 78.6%,
-    #e0d9c9 85.7%,
-    #e7e0d2 92.9%,
+    #978e7a 55.6%,
+    #a89f8c 61.1%,
+    #b8af9d 66.7%,
+    #c6beac 72.2%,
+    #d3cbba 77.8%,
+    #dcd5c5 83.3%,
+    #e3ddce 88.9%,
+    #e8e1d3 94.4%,
     #e9e3d5 100.0%
   );
 }
 .bridge-paper-to-dark {
-  height: 16rem;
+  height: 18rem;
+  margin-bottom: -1px;
   background: linear-gradient(
     180deg,
     #e9e3d5 0.0%,
-    #e7e0d2 7.1%,
-    #e0d9c9 14.3%,
-    #d4cdbc 21.4%,
-    #c5bcaa 28.6%,
-    #b2a996 35.7%,
-    #9c937f 42.9%,
+    #e8e1d3 5.6%,
+    #e3ddce 11.1%,
+    #dcd5c5 16.7%,
+    #d3cbba 22.2%,
+    #c6beac 27.8%,
+    #b8af9d 33.3%,
+    #a89f8c 38.9%,
+    #978e7a 44.4%,
     #857c69 50.0%,
-    #6d6453 57.1%,
-    #574e3f 64.3%,
-    #423a2e 71.4%,
-    #302a20 78.6%,
-    #221d16 85.7%,
-    #1a1610 92.9%,
+    #736958 55.6%,
+    #615848 61.1%,
+    #4f4739 66.7%,
+    #3f382c 72.2%,
+    #322c22 77.8%,
+    #262119 83.3%,
+    #1e1913 88.9%,
+    #19150f 94.4%,
     #17130e 100.0%
   );
 }
@@ -206,6 +217,69 @@ body {
 .grain > * {
   position: relative;
   z-index: 2;
+}
+
+/* --- the nib -------------------------------------------------------------
+   Only active when the Cursor component has confirmed a fine pointer and
+   no reduced-motion preference; everything is keyed off .has-nib so a
+   touch device never loses its native behaviour. */
+
+.has-nib,
+.has-nib a,
+.has-nib button,
+.has-nib [role="button"],
+.has-nib summary {
+  cursor: none;
+}
+.has-nib.nib-off,
+.has-nib.nib-off * {
+  cursor: auto;
+}
+
+.nib {
+  will-change: transform;
+  transition: opacity 0.2s ease;
+}
+.nib-stroke,
+.nib-bracket {
+  position: absolute;
+  display: block;
+  background: var(--brass-bright);
+  transition:
+    opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+/* Resting: one short stroke held at a writing angle. */
+.nib-stroke {
+  left: 8px;
+  top: 2px;
+  width: 1.5px;
+  height: 14px;
+  transform: rotate(38deg);
+  transform-origin: 50% 100%;
+}
+/* Active: the stroke retracts and two rules open around the target. */
+.nib[data-over="true"] .nib-stroke {
+  opacity: 0;
+  transform: rotate(38deg) scaleY(0.2);
+}
+.nib-bracket {
+  top: 4px;
+  width: 1.5px;
+  height: 10px;
+  opacity: 0;
+}
+.nib-bracket-l {
+  left: 3px;
+  transform: translateX(4px);
+}
+.nib-bracket-r {
+  left: 13px;
+  transform: translateX(-4px);
+}
+.nib[data-over="true"] .nib-bracket {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 @media (prefers-reduced-motion: reduce) {

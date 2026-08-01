@@ -119,7 +119,7 @@ export default function LaunchTable({ rows }: { rows: LaunchRow[] }) {
               ].map((h, i) => (
                 <th
                   key={h}
-                  className="eyebrow py-3 text-left font-normal"
+                  className="eyebrow whitespace-nowrap py-3 pr-4 text-left font-normal last:pr-0"
                   style={{ textAlign: i >= 3 && i !== 4 ? "right" : "left" }}
                 >
                   {h}
