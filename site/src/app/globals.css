@@ -98,6 +98,89 @@ body {
   background: var(--hairline);
 }
 
+/* --- atmosphere ----------------------------------------------------------
+   Every gradient stays inside the brand family: slate, brass, paper.
+   Depth comes from light, not from new colours. */
+
+/* Paper with a warm wash rising from the corners — a page under a lamp. */
+.bg-paper-warm {
+  background:
+    radial-gradient(120% 90% at 85% -10%, rgba(185, 141, 43, 0.09), transparent 55%),
+    radial-gradient(90% 70% at -10% 110%, rgba(185, 141, 43, 0.06), transparent 50%),
+    linear-gradient(180deg, var(--paper) 0%, var(--paper-sunk) 100%);
+}
+
+/* Sunk paper with the wash reversed, so alternating sections breathe. */
+.bg-paper-sunk-warm {
+  background:
+    radial-gradient(110% 80% at 10% -15%, rgba(185, 141, 43, 0.08), transparent 52%),
+    linear-gradient(180deg, var(--paper-sunk) 0%, var(--paper) 100%);
+}
+
+/* Instrument dark: slate lit from below by a brass horizon. */
+.bg-slate-glow {
+  background:
+    radial-gradient(90% 75% at 50% 115%, rgba(185, 141, 43, 0.22), transparent 60%),
+    radial-gradient(60% 45% at 82% -10%, rgba(185, 141, 43, 0.10), transparent 55%),
+    linear-gradient(180deg, var(--slate) 0%, #101316 55%, #15181c 100%);
+}
+
+/* Footer continues exactly where the dark section leaves off, so the
+   two dark rooms read as one space with the lamp lower down. */
+.bg-slate-glow-deep {
+  background:
+    radial-gradient(85% 70% at 50% 120%, rgba(185, 141, 43, 0.28), transparent 62%),
+    linear-gradient(180deg, #15181c 0%, var(--slate) 60%, #0b0e10 100%);
+}
+
+/* Bridges: no more walls between dark and paper. The stops walk through
+   a warm grey so the crossfade reads as light falling off, not a stripe. */
+.bridge-dark-to-paper {
+  height: 9rem;
+  background: linear-gradient(
+    180deg,
+    var(--slate) 0%,
+    #2e2f2e 22%,
+    #6b675c 48%,
+    #b3ac9c 72%,
+    #ddd9cd 88%,
+    var(--paper) 100%
+  );
+}
+.bridge-paper-to-dark {
+  height: 9rem;
+  background: linear-gradient(
+    180deg,
+    var(--paper) 0%,
+    #ddd9cd 12%,
+    #b3ac9c 28%,
+    #6b675c 52%,
+    #2e2f2e 78%,
+    var(--slate) 100%
+  );
+}
+
+/* Film grain, one data-URI, laid over atmospheric sections so large
+   gradients never band and flats never read as vector-flat. */
+.grain {
+  position: relative;
+  isolation: isolate;
+}
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.055'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.grain > * {
+  position: relative;
+  z-index: 2;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

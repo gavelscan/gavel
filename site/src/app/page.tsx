@@ -122,8 +122,10 @@ export default function Home() {
         </div>
       </LaunchField>
 
+      <div aria-hidden className="bridge-dark-to-paper" />
+
       {/* ── The finding ────────────────────────────────────────────────── */}
-      <section className="border-t border-hairline bg-paper px-6 py-24 sm:px-10 sm:py-32">
+      <section className="bg-paper-warm grain px-6 py-24 sm:px-10 sm:py-32">
         <div className="mx-auto max-w-6xl">
           <Reveal>
             <p className="eyebrow mb-8">Archive · every launch to date</p>
@@ -166,7 +168,7 @@ export default function Home() {
       </section>
 
       {/* ── Procedure ──────────────────────────────────────────────────── */}
-      <section className="border-t border-hairline bg-paper-sunk px-6 py-24 sm:px-10 sm:py-32">
+      <section className="bg-paper-sunk-warm grain px-6 py-24 sm:px-10 sm:py-32">
         <div className="mx-auto max-w-6xl">
           <Reveal>
             <p className="eyebrow mb-8">How a verdict is made</p>
@@ -206,14 +208,16 @@ export default function Home() {
         </div>
       </section>
 
+      <div aria-hidden className="bridge-paper-to-dark" />
+
       {/* ── What gets read ─────────────────────────────────────────────── */}
-      <section className="border-t border-hairline bg-paper px-6 py-24 sm:px-10 sm:py-32">
+      <section className="bg-slate-glow grain px-6 py-24 sm:px-10 sm:py-32">
         <div className="mx-auto max-w-6xl">
           <Reveal>
-            <p className="eyebrow mb-8">What gets read</p>
+            <p className="eyebrow mb-8 !text-[#8f949b]">What gets read</p>
           </Reveal>
           <Reveal delay={0.05}>
-            <blockquote className="display max-w-[26ch] text-[clamp(1.7rem,3.4vw,2.6rem)]">
+            <blockquote className="display max-w-[26ch] text-[clamp(1.7rem,3.4vw,2.6rem)] text-[#f2efe7]">
               Uniswap&rsquo;s own documentation calls it{" "}
               <span className="italic text-brass">
                 &ldquo;trivially easy&rdquo;
@@ -223,20 +227,20 @@ export default function Home() {
             </blockquote>
           </Reveal>
           <Reveal delay={0.1}>
-            <p className="mt-6 max-w-[54ch] text-ink-soft">
+            <p className="mt-6 max-w-[54ch] text-[#9aa0a8]">
               That is the whole job. These are the fields a verdict is built
               from — all public, all readable before an auction closes.
             </p>
           </Reveal>
 
-          <dl className="mt-16 border-t border-hairline">
+          <dl className="mt-16 border-t border-[#2a2e33]">
             {READS.map(([term, def], i) => (
               <Reveal key={term} delay={i * 0.04}>
-                <div className="grid gap-2 border-b border-hairline py-6 md:grid-cols-[16rem_1fr] md:gap-10">
+                <div className="grid gap-2 border-b border-[#2a2e33] py-6 md:grid-cols-[16rem_1fr] md:gap-10">
                   <dt className="data text-[13px] tracking-[0.05em] text-brass">
                     {term}
                   </dt>
-                  <dd className="text-[15.5px] text-ink-soft">{def}</dd>
+                  <dd className="text-[15.5px] text-[#9aa0a8]">{def}</dd>
                 </div>
               </Reveal>
             ))}
@@ -245,7 +249,7 @@ export default function Home() {
       </section>
 
       {/* ── Footer ─────────────────────────────────────────────────────── */}
-      <footer className="bg-slate px-6 py-20 sm:px-10">
+      <footer className="bg-slate-glow-deep grain px-6 py-20 sm:px-10">
         <div className="mx-auto max-w-6xl">
           <Reveal>
             <p className="display max-w-[18ch] text-[clamp(1.8rem,3.6vw,2.8rem)] text-[#f2efe7]">
