@@ -298,11 +298,17 @@ def render_banner(
     d = ImageDraw.Draw(im)
     margin = 104
 
-    # Kicker: a rule, then tracked mono. No wordmark — at this height the
-    # lockup and the headline fight, and the headline should win.
+    # Kicker: the mark at header size, then tracked mono. The full lockup
+    # (mark + wordmark + eyebrow) fights the headline in a band this
+    # shallow, but a banner with no mark at all has no face — the small
+    # mark carries the identity and the kicker text carries the words.
     ky = 92
-    d.line([(margin, ky), (margin + 54, ky)], fill=BRASS, width=3)
-    _tracked(d, kicker, font_mono(20), margin + 74, ky - 12, FAINT, tr=2.4)
+    kx = margin
+    if os.path.exists(mark_path):
+        m = Image.open(mark_path).convert("RGBA").resize((58, 58), Image.LANCZOS)
+        im.alpha_composite(m, (kx, ky - 29))
+        kx += 58 + 24
+    _tracked(d, kicker, font_mono(20), kx, ky - 13, FAINT, tr=2.4)
 
     # The sentence, vertically centred in what is left.
     top, bottom = 190, h - 150
