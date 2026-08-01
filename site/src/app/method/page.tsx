@@ -49,6 +49,10 @@ const GUARANTEES = [
     "A currency is an official Robinhood stock token only if its address is in the issuer's registry. A name that claims the pattern from an unregistered address is called an impostor — and only when the registry was actually readable.",
   ],
   [
+    "A warning has to be rare to be worth reading",
+    "Severity is set against the whole record, not against intuition. Paying an ordinary wallet is what most launches do, so it is published as context and cannot move a verdict; a wallet with almost no history is unusual, so it warns. Thresholds are read off the measured distribution and change when the distribution does.",
+  ],
+  [
     "GAVEL never touches funds",
     "No custody, no keys, no wallet connection anywhere in the system. If every GAVEL process stopped right now, no one's money would be affected, because there is no path from this software to money.",
   ],
