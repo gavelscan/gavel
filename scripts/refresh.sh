@@ -22,6 +22,9 @@ fi
 echo $$ > data/.refresh.pid
 trap 'rm -f data/.refresh.pid' EXIT
 
+# Local config (extra RPC endpoints, keys) lives in a gitignored .env.
+if [ -f .env ]; then set -a; . ./.env; set +a; fi
+
 say() { echo "$(date -u +%FT%TZ) $*"; }
 
 say "pulling new events"

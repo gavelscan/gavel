@@ -10,7 +10,9 @@ from typing import Any, List, Optional
 
 import requests
 
-from .constants import DEFAULT_RPC
+import os
+
+from .constants import DEFAULT_RPC, FALLBACK_RPCS
 
 
 class RpcError(Exception):
@@ -18,30 +20,58 @@ class RpcError(Exception):
 
 
 class Rpc:
-    def __init__(self, url: str = DEFAULT_RPC, timeout: int = 15, retries: int = 3):
-        self.url = url
+    """A client that treats one flaky endpoint as a transport problem, not
+    as evidence about the chain.
+
+    Node errors (a revert, a bad parameter) are the chain answering and are
+    raised immediately. Transport failures are retried, then the next
+    endpoint is tried, because a dropped connection must never be allowed
+    to read as "this launch does not exist".
+    """
+
+    def __init__(self, url: Optional[str] = None, timeout: int = 15,
+                 retries: int = 2):
+        env = os.environ.get("GAVEL_RPCS")
+        if url:
+            self.urls = [url]
+        elif env:
+            self.urls = [u.strip() for u in env.split(",") if u.strip()]
+        else:
+            self.urls = list(FALLBACK_RPCS)
+        self.url = self.urls[0]
         self.timeout = timeout
         self.retries = retries
         self._id = 0
+        self._preferred = 0
 
     def call(self, method: str, params: list) -> Any:
         self._id += 1
         payload = {"jsonrpc": "2.0", "id": self._id, "method": method, "params": params}
         last_err: Optional[Exception] = None
-        for attempt in range(self.retries):
-            try:
-                resp = requests.post(self.url, json=payload, timeout=self.timeout)
-                resp.raise_for_status()
-                body = resp.json()
-                if "error" in body:
-                    raise RpcError("%s: %s" % (method, body["error"]))
-                if "result" not in body:
-                    raise RpcError("%s: malformed response (no result, no error)" % method)
-                return body["result"]
-            except (requests.RequestException, json.JSONDecodeError) as e:
-                last_err = e
-                time.sleep(1 + attempt)
-        raise RpcError("%s failed after %d retries: %s" % (method, self.retries, last_err))
+        order = self.urls[self._preferred:] + self.urls[:self._preferred]
+
+        for idx, url in enumerate(order):
+            for attempt in range(self.retries):
+                try:
+                    resp = requests.post(url, json=payload, timeout=self.timeout)
+                    resp.raise_for_status()
+                    body = resp.json()
+                    if "error" in body:
+                        # The node answered. That is a fact, not an outage —
+                        # do not retry it against another endpoint.
+                        raise RpcError("%s: %s" % (method, body["error"]))
+                    if "result" not in body:
+                        raise RpcError(
+                            "%s: malformed response (no result, no error)" % method)
+                    # Stick with whatever endpoint is currently working.
+                    self._preferred = (self._preferred + idx) % len(self.urls)
+                    self.url = url
+                    return body["result"]
+                except (requests.RequestException, json.JSONDecodeError) as e:
+                    last_err = e
+                    time.sleep(0.5 * (attempt + 1))
+        raise RpcError("%s failed on %d endpoint(s): %s"
+                       % (method, len(self.urls), last_err))
 
     # -- convenience wrappers -------------------------------------------------
 

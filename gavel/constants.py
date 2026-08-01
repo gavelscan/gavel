@@ -3,6 +3,13 @@
 CHAIN_ID = 4663
 DEFAULT_RPC = "https://rpc.mainnet.chain.robinhood.com"
 
+# The public endpoint drops connections under sustained reads, and a
+# dropped read used to mean a launch quietly missing from the record —
+# the exact "unreachable treated as absent" failure the invariants exist
+# to prevent. Set GAVEL_RPCS to a comma-separated list to add fallbacks;
+# keyed endpoints belong in .env or a CI secret, never in this file.
+FALLBACK_RPCS = [DEFAULT_RPC]
+
 # Uniswap Liquidity Launcher deployments on Robinhood Chain
 # Source: github.com/Uniswap/liquidity-launcher README (v3.0.0 / v3.1.0),
 # bytecode presence verified on-chain 2026-07-31.

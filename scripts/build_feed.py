@@ -150,6 +150,46 @@ def main():
             time.sleep(0.05)
         rows.append(row)
 
+    if skipped:
+        print("retrying %d deferred launch(es)" % len(skipped), flush=True)
+        still = []
+        for launch, _ in skipped:
+            ini = launch["initializer"].lower()
+            try:
+                sheet = build_factsheet(rpc, launch, current_block=head)
+                outcome = rpc.auction_outcome(launch["initializer"])
+                p2 = launch["params"]
+                cache[ini] = {
+                    "ini": launch["initializer"], "tx": launch["tx"],
+                    "block": launch["block"], "token": p2["token"],
+                    "sym": rpc.read_string(p2["token"], Rpc.SEL_SYMBOL),
+                    "currency": p2["currency"],
+                    "cur_sym": ("ETH" if p2["currency"] == ZERO_ADDRESS
+                                else rpc.read_string(p2["currency"], Rpc.SEL_SYMBOL)),
+                    "cur_official": bool(sheet["currency"].get("official")),
+                    "recipient": p2["recipient"],
+                    "rec_code": sheet["recipient"]["code_size"],
+                    "rec_nonce": sheet["recipient"]["nonce"],
+                    "lp_ratio": sheet["reserved_lp_ratio"],
+                    "fee": p2["pool"]["fee"], "hook": p2["pool"]["hook"],
+                    "migration_block": p2["migrationBlock"],
+                    "cleared": outcome["cleared"], "sold": outcome["sold"],
+                    "raised": outcome["raised"], "ceiling": sheet["ceiling"],
+                    "findings": [{"k": k, "s": sv, "d": d}
+                                 for k, sv, d in sheet["findings"]],
+                    "state": ("unfilled" if p2["migrationBlock"] < head
+                              and not outcome["cleared"] else "silent"),
+                }
+                rows.append(cache[ini])
+            except RpcError as e:
+                still.append((launch, str(e)))
+        if still:
+            # Loud, because a launch missing from the record is the one
+            # failure this project cannot afford to shrug at.
+            print("WARNING: %d launch(es) unreadable this run and absent from "
+                  "the build; they will be retried next run" % len(still),
+                  flush=True)
+
     save_cache(cache)
     rows.sort(key=lambda r: -r["block"])
     with open(OUT, "w") as f:
