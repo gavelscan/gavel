@@ -27,10 +27,26 @@ OUT = "data/feed.json"
 
 
 def load_cache():
+    """Prefer the working cache; fall back to the last published feed.
+
+    Rebuilding from an empty cache means every launch depends on the node
+    answering right now, and a flaky node then drops launches from the
+    record entirely — the count on the site would quietly shrink. Seeding
+    from the published feed makes a refresh additive.
+    """
     if os.path.exists(CACHE):
         with open(CACHE) as f:
             return json.load(f)
-    return {}
+    seed = {}
+    for path in (OUT, os.path.join("site", "src", "app", "feed.json")):
+        if os.path.exists(path):
+            with open(path) as f:
+                for row in json.load(f).get("rows", []):
+                    seed[row["ini"].lower()] = row
+            break
+    if seed:
+        print("seeded cache with %d rows from the last published feed" % len(seed))
+    return seed
 
 
 def save_cache(cache):
@@ -51,6 +67,7 @@ def main():
     head = rpc.block_number()
     cache = load_cache()
     rows = []
+    unresolved = []
     todo = sorted(launches, key=lambda x: -x["block"])
     if limit:
         todo = todo[:limit]
@@ -65,14 +82,28 @@ def main():
         elif p["migrationBlock"] >= head:
             state = "live"
         else:
-            state = "silent"
+            state = "silent"  # refined below once the auction is read
 
         if ini in cache:
             row = cache[ini]
             row["state"] = state  # state can change over time
+            if "cleared" not in row:
+                try:
+                    o = rpc.auction_outcome(launch["initializer"])
+                    row.update(cleared=o["cleared"], sold=o["sold"],
+                               raised=o["raised"])
+                    cache[ini] = row
+                except RpcError:
+                    unresolved.append(ini)
+            # An auction past its migration block that never reached a
+            # clearing price did not "fail to migrate" — nobody bid enough
+            # for there to be anything to migrate. Say which.
+            if state == "silent" and row.get("cleared") is False:
+                row["state"] = "unfilled"
         else:
             try:
                 sheet = build_factsheet(rpc, launch, current_block=head)
+                outcome = rpc.auction_outcome(launch["initializer"])
                 token_symbol = rpc.read_string(p["token"], Rpc.SEL_SYMBOL)
                 currency_symbol = (
                     "ETH" if p["currency"] == ZERO_ADDRESS
@@ -94,18 +125,27 @@ def main():
                     "fee": p["pool"]["fee"],
                     "hook": p["pool"]["hook"],
                     "migration_block": p["migrationBlock"],
+                    "cleared": outcome["cleared"],
+                    "sold": outcome["sold"],
+                    "raised": outcome["raised"],
                     "ceiling": sheet["ceiling"],
                     "findings": [
                         {"k": k, "s": s, "d": d} for k, s, d in sheet["findings"]
                     ],
-                    "state": state,
+                    "state": ("unfilled" if state == "silent"
+                              and not outcome["cleared"] else state),
                 }
                 cache[ini] = row
                 if i % 10 == 0:
                     save_cache(cache)
                     print("  %d/%d" % (i + 1, len(todo)), flush=True)
             except RpcError as e:
-                print("  skip %s: %s" % (ini[:10], e), flush=True)
+                # Unreachable is not absent (I5). Keep whatever we already
+                # published for this launch rather than deleting it from
+                # the record; if we have nothing, leave it out of this
+                # build and say so, but never write a guess.
+                print("  unresolved %s: %s" % (ini[:10], str(e)[:70]), flush=True)
+                unresolved.append(ini)
                 continue
             time.sleep(0.05)
         rows.append(row)
@@ -115,6 +155,10 @@ def main():
     with open(OUT, "w") as f:
         json.dump({"head": head, "rows": rows}, f, separators=(",", ":"))
     print("wrote %s: %d rows" % (OUT, len(rows)))
+    if unresolved:
+        print("%d launches could not be read this run and kept their last "
+              "published values or were skipped: %s"
+              % (len(unresolved), ", ".join(a[:10] for a in unresolved[:5])))
 
 
 if __name__ == "__main__":

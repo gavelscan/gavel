@@ -28,7 +28,8 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: "live", label: "in auction" },
   { key: "pool", label: "became a pool" },
   { key: "failed", label: "migration failed" },
-  { key: "silent", label: "never migrated" },
+  { key: "unfilled", label: "drew no bids" },
+  { key: "silent", label: "cleared, not migrated" },
   { key: "flagged", label: "ceiling not PASS" },
 ];
 

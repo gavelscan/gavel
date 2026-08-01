@@ -77,6 +77,36 @@ class Rpc:
     SEL_SYMBOL = "0x95d89b41"        # symbol()
     SEL_NAME = "0x06fdde03"          # name()
     SEL_TOTAL_SUPPLY = "0x18160ddd"  # totalSupply()
+    SEL_LBP_PARAMS = "0xe1d97d1f"    # lbpInitializationParams()
+
+    def auction_outcome(self, initializer: str):
+        """What the auction itself says about how it ended.
+
+        The chain emits no event for an auction that failed to draw bids:
+        it simply sits past its migration block in silence, which looks
+        identical to one that cleared and was never migrated. The
+        initializer distinguishes them — it reverts until a clearing price
+        exists — so this is the only way to tell "nobody bid" from "nobody
+        pressed the button".
+
+        Returns {"cleared": bool, "sold": int, "raised": int}. A revert
+        means not cleared; an RPC failure propagates, because unreachable
+        is not the same as unfilled (I5).
+        """
+        try:
+            raw = self.eth_call(initializer, self.SEL_LBP_PARAMS)
+        except RpcError as e:
+            if "revert" in str(e).lower():
+                return {"cleared": False, "sold": 0, "raised": 0}
+            raise
+        if not raw or raw == "0x" or len(raw) < 2 + 192:
+            return {"cleared": False, "sold": 0, "raised": 0}
+        b = bytes.fromhex(raw[2:])
+        return {
+            "cleared": True,
+            "sold": int.from_bytes(b[32:64], "big"),
+            "raised": int.from_bytes(b[64:96], "big"),
+        }
 
     def read_string(self, to: str, selector: str) -> Optional[str]:
         """Read a string-returning view. None means the call reverted or
