@@ -6,13 +6,15 @@
  *
  * The block number is the point. It is fetched from the chain in the
  * browser, so a stalled or wrong number is visible to anyone — a site that
- * claims to read a chain should prove it is still reading it.
+ * claims to read a chain should prove it is still reading it. On small
+ * screens it moves into the menu sheet rather than disappearing, because
+ * hiding the proof of life on the device most readers use would defeat it.
  */
 
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const RPC = "https://rpc.mainnet.chain.robinhood.com";
 
@@ -21,7 +23,7 @@ const LINKS = [
   { href: "/method", label: "Method" },
 ];
 
-function BlockChip() {
+function useBlockHeight() {
   const [block, setBlock] = useState<number | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -67,9 +69,14 @@ function BlockChip() {
       ? "READING CHAIN…"
       : `BLOCK ${block.toLocaleString("en-US")}`;
 
+  return { label, failed, pending: block === null && !failed };
+}
+
+function BlockChip({ className = "" }: { className?: string }) {
+  const { label, failed, pending } = useBlockHeight();
   return (
     <span
-      className="data hidden items-center gap-2 text-[11px] tracking-[0.14em] sm:inline-flex"
+      className={`data inline-flex items-center gap-2 text-[11px] tracking-[0.14em] ${className}`}
       style={{ color: failed ? "var(--fail)" : "var(--ink-soft)" }}
       title={failed ? "Could not reach a Robinhood Chain RPC" : undefined}
     >
@@ -78,10 +85,41 @@ function BlockChip() {
         className="block h-[6px] w-[6px] rounded-full"
         style={{
           background: failed ? "var(--fail)" : "var(--pass)",
-          opacity: block === null && !failed ? 0.4 : 1,
+          opacity: pending ? 0.4 : 1,
         }}
       />
       {label}
+    </span>
+  );
+}
+
+/** Three hairlines — the same rules used everywhere else on the page —
+ *  folding into a cross. */
+function MenuIcon({ open, tone }: { open: boolean; tone: string }) {
+  const bar =
+    "absolute left-0 block h-[1.5px] w-full transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]";
+  return (
+    <span aria-hidden className="relative block h-[14px] w-[22px]">
+      <span
+        className={bar}
+        style={{
+          background: tone,
+          top: 0,
+          transform: open ? "translateY(6px) rotate(45deg)" : "none",
+        }}
+      />
+      <span
+        className={bar}
+        style={{ background: tone, top: 6, opacity: open ? 0 : 1 }}
+      />
+      <span
+        className={bar}
+        style={{
+          background: tone,
+          top: 12,
+          transform: open ? "translateY(-6px) rotate(-45deg)" : "none",
+        }}
+      />
     </span>
   );
 }
@@ -93,6 +131,7 @@ export default function Nav() {
   // arbitrary scroll offset — the hero is 230vh tall, and a white bar
   // appearing over it forty pixels in was the jolt.
   const [t, setT] = useState(pathname === "/" ? 0 : 1);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (pathname !== "/") {
@@ -119,6 +158,20 @@ export default function Nav() {
     };
   }, [pathname]);
 
+  // Close on route change and on Escape; lock the page behind the sheet.
+  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   // Text must not spend the whole fade at half contrast: it flips over a
   // narrow window around the point where the paper sheet actually covers
   // the scrim, so labels stay readable on both sides of the transition.
@@ -126,14 +179,17 @@ export default function Nav() {
     const u = Math.min(1, Math.max(0, (x - 0.42) / 0.22));
     return u * u * (3 - 2 * u);
   };
-  const tText = step(t);
-  const mix = (over: string, paper: string) =>
-    `color-mix(in oklab, ${over} ${(1 - tText) * 100}%, ${paper})`;
+  // With the sheet open the bar is paper, whatever is behind it.
+  const tText = open ? 1 : step(t);
+  const tBg = open ? 1 : t;
+  const mix = useCallback(
+    (over: string, paper: string) =>
+      `color-mix(in oklab, ${over} ${(1 - tText) * 100}%, ${paper})`,
+    [tText],
+  );
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
-      {/* Two stacked washes crossfade with the section behind the bar: a
-          soft dark scrim over the hero, paper everywhere else. */}
       {/* The dark scrim stays put and the paper sheet fades in on top of
           it. Crossfading both at once left a half-transparent hole in the
           middle of the transition where the bar turned muddy. */}
@@ -147,14 +203,15 @@ export default function Nav() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0"
+        className="pointer-events-none absolute inset-0 transition-opacity duration-300"
         style={{
-          opacity: t,
+          opacity: tBg,
           background: "var(--paper)",
           borderBottom: "1px solid var(--hairline)",
         }}
       />
-      <div className="relative mx-auto flex h-16 max-w-6xl items-center justify-between px-6 sm:px-10">
+
+      <div className="relative mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-10">
         <Link href="/" className="flex items-center gap-3">
           <Image
             src="/brand/gavel-mark-tight.png"
@@ -171,7 +228,8 @@ export default function Nav() {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-7">
+        {/* Desktop and tablet */}
+        <nav className="hidden items-center gap-7 md:flex">
           {LINKS.map((l) => {
             const active = pathname.startsWith(l.href);
             return (
@@ -180,7 +238,10 @@ export default function Nav() {
                 href={l.href}
                 className="data text-[12px] tracking-[0.1em] transition-opacity hover:opacity-100"
                 style={{
-                  color: mix("#c9ccd1", active ? "var(--brass)" : "var(--ink-soft)"),
+                  color: mix(
+                    "#c9ccd1",
+                    active ? "var(--brass)" : "var(--ink-soft)",
+                  ),
                   opacity: active ? 1 : 0.85,
                 }}
               >
@@ -190,12 +251,61 @@ export default function Nav() {
           })}
           <span
             aria-hidden
-            className="hidden h-4 w-px sm:block"
+            className="h-4 w-px"
             style={{ background: mix("#2a2e33", "var(--hairline)") }}
           />
           <span style={{ opacity: t }}>
             <BlockChip />
           </span>
+        </nav>
+
+        {/* Small screens */}
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          aria-controls="nav-sheet"
+          aria-label={open ? "Close menu" : "Open menu"}
+          className="-mr-2 grid h-11 w-11 place-items-center md:hidden"
+        >
+          <MenuIcon open={open} tone={mix("#e2ded4", "var(--ink)")} />
+        </button>
+      </div>
+
+      {/* The sheet unfolds the header rather than dropping a modal on the
+          page, so the bar and the menu stay one object. */}
+      <div
+        id="nav-sheet"
+        className="relative overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden"
+        style={{
+          maxHeight: open ? 300 : 0,
+          opacity: open ? 1 : 0,
+          background: "var(--paper)",
+          borderBottom: open ? "1px solid var(--hairline)" : "none",
+        }}
+      >
+        <nav className="flex flex-col px-5 pb-6 pt-1">
+          {LINKS.map((l) => {
+            const active = pathname.startsWith(l.href);
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setOpen(false)}
+                className="display border-b border-hairline py-4 text-[1.7rem]"
+                style={{ color: active ? "var(--brass)" : "var(--ink)" }}
+              >
+                {l.label}
+              </Link>
+            );
+          })}
+          <a
+            href="https://github.com/gavelscan/gavel"
+            className="data border-b border-hairline py-4 text-[12px] tracking-[0.12em] text-ink-soft"
+          >
+            SOURCE ↗
+          </a>
+          <BlockChip className="pt-5" />
         </nav>
       </div>
     </header>

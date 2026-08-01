@@ -58,7 +58,7 @@ export default function LaunchTable({ rows }: { rows: LaunchRow[] }) {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-3">
+      <div className="-mx-5 flex snap-x gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:flex-wrap sm:gap-y-3 sm:overflow-visible sm:px-0">
         {FILTERS.map((f) => {
           const on = filter === f.key;
           return (
@@ -68,7 +68,7 @@ export default function LaunchTable({ rows }: { rows: LaunchRow[] }) {
                 setFilter(f.key);
                 setShown(PAGE);
               }}
-              className="data border px-3 py-1.5 text-[11px] tracking-[0.1em] transition-colors"
+              className="data shrink-0 snap-start whitespace-nowrap border px-3 py-1.5 text-[11px] tracking-[0.1em] transition-colors"
               style={{
                 borderColor: on ? "var(--brass)" : "var(--hairline)",
                 color: on ? "var(--brass)" : "var(--ink-soft)",
@@ -87,7 +87,7 @@ export default function LaunchTable({ rows }: { rows: LaunchRow[] }) {
           }}
           placeholder="symbol or address"
           aria-label="Search launches by symbol or address"
-          className="data ml-auto w-full max-w-[16rem] border px-3 py-1.5 text-[12px] outline-none"
+          className="data w-full min-w-[11rem] shrink-0 border px-3 py-1.5 text-[12px] outline-none sm:ml-auto sm:max-w-[16rem]"
           style={{
             borderColor: "var(--hairline)",
             background: "transparent",
@@ -101,7 +101,10 @@ export default function LaunchTable({ rows }: { rows: LaunchRow[] }) {
         {rows.length.toLocaleString("en-US")} LAUNCHES
       </p>
 
-      <div className="mt-4 overflow-x-auto">
+      {/* A ledger needs columns; a phone does not have them. Below md the
+          same rows are re-set as stacked records rather than a table the
+          reader has to drag sideways. */}
+      <div className="mt-4 hidden overflow-x-auto md:block">
         <table className="w-full min-w-[62rem] border-collapse">
           <thead>
             <tr className="border-y border-hairline">
@@ -199,6 +202,69 @@ export default function LaunchTable({ rows }: { rows: LaunchRow[] }) {
           </tbody>
         </table>
       </div>
+
+      <ul className="mt-2 md:hidden">
+        {visible.map((r) => (
+          <li key={r.ini} className="border-b border-hairline py-5">
+            <Link href={`/launch/${r.ini}`} className="block">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <span className="data block truncate text-[15px] text-ink">
+                    {safeSymbol(r.sym)}
+                  </span>
+                  <span className="data mt-1 block text-[11px] text-ink-soft">
+                    {shortAddr(r.token)}
+                  </span>
+                </div>
+                <span
+                  className="data shrink-0 border px-2 py-0.5 text-[11px] tracking-[0.12em]"
+                  style={{
+                    color: CEILING_TONE[r.ceiling],
+                    borderColor: CEILING_TONE[r.ceiling],
+                  }}
+                >
+                  {r.ceiling}
+                </span>
+              </div>
+
+              <dl className="mt-3.5 grid grid-cols-2 gap-x-4 gap-y-2.5">
+                {[
+                  [
+                    "priced in",
+                    `${safeSymbol(r.cur_sym)}${r.cur_official ? " · official" : ""}`,
+                  ],
+                  ["LP reserve", pct(r.lp_ratio)],
+                  [
+                    "recipient",
+                    r.rec_code > 0
+                      ? "contract"
+                      : r.rec_nonce === 0
+                        ? "fresh EOA"
+                        : "EOA",
+                  ],
+                  ["block", r.block.toLocaleString("en-US")],
+                ].map(([k, v]) => (
+                  <div key={k}>
+                    <dt className="eyebrow !text-[10px]">{k}</dt>
+                    <dd className="data mt-0.5 text-[12.5px]">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+
+              <p className="mt-3.5 flex items-center gap-2">
+                <span
+                  aria-hidden
+                  className="block h-[11px] w-[3px]"
+                  style={{ background: STATE_TONE[r.state] }}
+                />
+                <span className="data text-[11.5px] text-ink-soft">
+                  {STATE_LABEL[r.state]}
+                </span>
+              </p>
+            </Link>
+          </li>
+        ))}
+      </ul>
 
       {visible.length === 0 && (
         <p className="mt-10 text-ink-soft">
