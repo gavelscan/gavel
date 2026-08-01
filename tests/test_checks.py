@@ -13,7 +13,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from gavel.checks import (  # noqa: E402
     FAIL,
     FLAG,
+    INFO,
     PASS,
+    affects_ceiling,
     check_pool,
     check_positions,
     check_recipient,
@@ -95,17 +97,27 @@ class TestScheduleChecks(unittest.TestCase):
                                    bracket(100, 1_000_000)])
         self.assertTrue(any(f[0] == "schedule_not_ascending" for f in findings))
 
-    def test_low_terminal_lp_rate_flagged(self):
-        # 99% of raise to LP below 1000, then 1% above — classic drain shape:
-        # look generous early, keep the real money.
+    def test_drain_shape_fails(self):
+        # Generous below the threshold, 1% above it: the real money never
+        # reaches liquidity. This is the shape a FAIL exists for.
         findings = check_schedule([bracket(0, 9_900_000), bracket(1000, 100_000)])
-        names = [f[0] for f in findings]
-        self.assertIn("schedule_low_terminal_lp", names)
-        self.assertTrue(all(f[1] != FAIL for f in findings))
+        self.assertIn("exit_drain", [f[0] for f in findings])
+        self.assertIn(FAIL, [f[1] for f in findings])
 
-    def test_healthy_terminal_rate_not_flagged(self):
-        findings = check_schedule([bracket(0, 5_000_000), bracket(1000, 8_000_000)])
-        self.assertEqual(findings, [])
+    def test_heavy_exit_flags(self):
+        findings = check_schedule([bracket(0, 3_000_000)])
+        self.assertIn("exit_heavy", [f[0] for f in findings])
+        self.assertIn(FLAG, [f[1] for f in findings])
+
+    def test_partial_exit_is_context_not_warning(self):
+        # 80% to liquidity is worth stating and not worth warning about.
+        findings = check_schedule([bracket(0, 8_000_000)])
+        self.assertEqual([f[0] for f in findings], ["exit_partial"])
+        self.assertEqual(findings[0][1], INFO)
+
+    def test_full_routing_says_nothing(self):
+        # Routing the whole raise is what 83% of the record does. Silence.
+        self.assertEqual(check_schedule([bracket(0, 10_000_000)]), [])
 
 
 class TestPositionChecks(unittest.TestCase):
@@ -151,20 +163,49 @@ class TestPoolChecks(unittest.TestCase):
 
 
 class TestRecipientChecks(unittest.TestCase):
-    def test_contract_recipient_clean(self):
-        facts = {"address": "0x1", "code_size": 100, "nonce": 1, "balance_wei": 0}
-        self.assertEqual(check_recipient(facts), [])
+    """Paying an ordinary wallet is the base rate — 85% of the record — so
+    it is context. Only an unproven wallet is a warning."""
 
-    def test_fresh_eoa_flagged_with_detail(self):
+    def test_contract_recipient_is_context(self):
+        facts = {"address": "0x1", "code_size": 100, "nonce": 1, "balance_wei": 0}
+        findings = check_recipient(facts)
+        self.assertEqual(findings[0][0], "recipient_contract")
+        self.assertEqual(findings[0][1], INFO)
+
+    def test_never_used_wallet_flags(self):
         facts = {"address": "0x1", "code_size": 0, "nonce": 0, "balance_wei": 0}
         findings = check_recipient(facts)
-        self.assertEqual(findings[0][0], "recipient_eoa")
-        self.assertIn("fresh EOA", findings[0][2])
+        self.assertEqual(findings[0][0], "recipient_fresh")
+        self.assertEqual(findings[0][1], FLAG)
 
-    def test_active_eoa_flagged(self):
+    def test_barely_used_wallet_flags(self):
+        facts = {"address": "0x1", "code_size": 0, "nonce": 2, "balance_wei": 0}
+        self.assertEqual(check_recipient(facts)[0][1], FLAG)
+
+    def test_active_wallet_is_context_not_warning(self):
         facts = {"address": "0x1", "code_size": 0, "nonce": 500, "balance_wei": 10}
         findings = check_recipient(facts)
-        self.assertEqual(findings[0][1], FLAG)
+        self.assertEqual(findings[0][0], "recipient_eoa")
+        self.assertEqual(findings[0][1], INFO)
+
+
+class TestInfoNeverMovesTheCeiling(unittest.TestCase):
+    """The whole point of INFO: it is published, and it changes nothing.
+    A calibration that let context cap a verdict is what produced 88% FLAG."""
+
+    def test_affects_ceiling(self):
+        self.assertTrue(affects_ceiling(PASS))
+        self.assertTrue(affects_ceiling(FLAG))
+        self.assertTrue(affects_ceiling(FAIL))
+        self.assertFalse(affects_ceiling(INFO))
+
+    def test_info_only_findings_leave_pass(self):
+        from gavel.checks import worse
+        ceiling = PASS
+        for _sev in (INFO, INFO, INFO):
+            if affects_ceiling(_sev):
+                ceiling = worse(ceiling, _sev)
+        self.assertEqual(ceiling, PASS)
 
 
 if __name__ == "__main__":

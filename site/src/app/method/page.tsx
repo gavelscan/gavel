@@ -28,6 +28,11 @@ const CLAUSES = [
     head: "The verdict is published with its evidence",
     body: "Three states, no scores: PASS, FLAG, FAIL. Each verdict carries the findings it rests on and the transaction it came from, so a reader can disagree with the reasoning without having to trust the reader.",
   },
+  {
+    n: "05",
+    head: "Context is published, but it does not warn",
+    body: "Most launches pay an ordinary wallet and price the auction in ETH. Those facts are worth stating and are not warnings, so they are recorded as context and cannot move a verdict. Warnings are kept for what is genuinely unusual against the whole record — a recipient with almost no history, a raise that keeps most of itself back from liquidity. A verdict layer earns attention by being quiet.",
+  },
 ];
 
 const GUARANTEES = [

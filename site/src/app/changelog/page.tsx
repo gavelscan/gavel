@@ -20,6 +20,12 @@ const ENTRIES: Entry[] = [
   {
     date: "2026-08-01",
     kind: "correction",
+    head: "The verdict said FLAG about almost everything, which is the same as saying nothing",
+    body: "Under the first calibration 87% of the record sat below PASS, and the reason was a single check: paying an ordinary wallet was treated as a warning, when 85% of launches do exactly that. A signal that fires on five launches in six is not a signal. Findings now carry an INFO severity that is published but moves nothing, warnings are reserved for what is actually unusual — a recipient wallet with almost no history, a raise that routes less than half of itself to liquidity — and FAIL for what is structural, like a schedule that sends the money past liquidity entirely. Measured across the whole record the split is now roughly four in five PASS, one in six FLAG, and a handful of FAIL. A verdict layer should be quiet like a smoke alarm, not loud like a car alarm.",
+  },
+  {
+    date: "2026-08-01",
+    kind: "correction",
     head: "The header showed a live block number over a snapshot",
     body: "The chip in the header reported the chain's current height, which read as a promise that the record was keeping pace with it. It was not: these pages are rebuilt from a snapshot, and that snapshot can be an hour or more behind. The chip now reports the block the data was actually read at and how far behind the chain that leaves it, and turns amber once the gap is wide enough to matter.",
   },

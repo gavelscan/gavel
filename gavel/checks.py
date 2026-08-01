@@ -25,7 +25,18 @@ from .constants import (
 )
 
 PASS, FLAG, FAIL = "PASS", "FLAG", "FAIL"
+
+# INFO is recorded and displayed but does NOT move the ceiling. It exists
+# because the first calibration flagged conditions that are simply the base
+# rate — 85% of launches pay an ordinary EOA — and a signal that fires on
+# five launches in six is not a signal, it is a broken smoke alarm. What
+# earns a FLAG has to be unusual; what earns a FAIL has to be structural.
+INFO = "INFO"
 _ORDER = {PASS: 2, FLAG: 1, FAIL: 0}
+
+
+def affects_ceiling(severity: str) -> bool:
+    return severity in _ORDER
 
 # Official RHJ stock-token registry (chain 4663). Membership makes
 # "official stock token" a FACT rather than a name-pattern guess — an
@@ -67,16 +78,26 @@ def check_schedule(brackets: list) -> list:
             findings.append(("schedule_not_ascending", FAIL, "bracket %d" % i))
         prev = b["lowerThreshold"]
 
-    # Economics: the top bracket's rate is what applies to the bulk of a
-    # successful raise. A tiny terminal rate means most raised currency is
-    # NOT going into LP — it is going to `recipient`.
-    terminal_rate = brackets[-1]["rate"]
-    terminal_pct = terminal_rate / MAX_BRACKET_RATE * 100
-    if terminal_pct < 20:
+    # Where the money goes. The top bracket's rate applies to the bulk of a
+    # successful raise, so it is the closest thing to "how much of what you
+    # bid becomes liquidity". Routing all of it is the norm (83% of the
+    # record), which is why only the shortfalls are worth saying.
+    terminal = brackets[-1]["rate"] / MAX_BRACKET_RATE
+    pct = terminal * 100
+    if terminal < 0.05:
         findings.append((
-            "schedule_low_terminal_lp",
-            FLAG,
-            "only %.1f%% of currency above the last threshold goes to LP; the rest exits to recipient" % terminal_pct,
+            "exit_drain", FAIL,
+            "only %.1f%% of the raise is routed to liquidity; the rest exits to the recipient" % pct,
+        ))
+    elif terminal < 0.50:
+        findings.append((
+            "exit_heavy", FLAG,
+            "%.0f%% of the raise is routed to liquidity; the remainder exits to the recipient" % pct,
+        ))
+    elif terminal < 0.95:
+        findings.append((
+            "exit_partial", INFO,
+            "%.0f%% of the raise is routed to liquidity" % pct,
         ))
     return findings
 
@@ -105,7 +126,11 @@ def check_pool(pool: dict) -> list:
     elif fee > MAX_LP_FEE:
         findings.append(("pool_invalid_fee", FAIL, "fee %d > max" % fee))
     elif fee > 100_000:  # >10% LP fee: legal, hostile
-        findings.append(("pool_extreme_fee", FLAG, "LP fee %.2f%%" % (fee / 10_000)))
+        findings.append(("pool_extreme_fee", FLAG,
+                         "committed pool charges a %.1f%% LP fee" % (fee / 10_000)))
+    elif fee > 20_000:  # 2-10%: high but used
+        findings.append(("pool_high_fee", INFO,
+                         "committed pool charges a %.1f%% LP fee" % (fee / 10_000)))
     if pool["hook"] != ZERO_ADDRESS:
         findings.append(("pool_nonzero_hook", FLAG,
                          "custom hook %s — economic behavior needs judgment" % pool["hook"]))
@@ -124,21 +149,31 @@ def gather_address_facts(rpc: Rpc, address: str) -> dict:
 
 
 def check_recipient(facts: dict) -> list:
-    findings = []
-    if facts["code_size"] == 0:
-        sev = FLAG
-        detail = "recipient is an EOA (nonce %d)" % facts["nonce"]
-        if facts["nonce"] == 0 and facts["balance_wei"] == 0:
-            detail = "recipient is a fresh EOA: 0 tx, 0 balance"
-        findings.append(("recipient_eoa", sev, detail))
-    return findings
+    """Paying an ordinary EOA is what 85% of launches do; saying so is
+    context, not a warning. A recipient with almost no history is the
+    unusual shape, and that is what gets flagged."""
+    if facts["code_size"] > 0:
+        return [("recipient_contract", INFO,
+                 "raised funds are routed to a contract")]
+    nonce = facts["nonce"]
+    if nonce == 0:
+        return [("recipient_fresh", FLAG,
+                 "recipient wallet has never sent a transaction")]
+    if nonce < 3:
+        return [("recipient_new", FLAG,
+                 "recipient wallet has almost no history (%d prior transactions)" % nonce)]
+    return [("recipient_eoa", INFO,
+             "recipient is a wallet with %d prior transactions" % nonce)]
 
 
 def check_currency(rpc: Rpc, currency: str) -> dict:
     """Facts about the auction currency. Judgment about authenticity
     (real RHJ stock token vs impostor) belongs to the judge, not here."""
     if currency == ZERO_ADDRESS:
-        return {"kind": "native_eth", "official": False, "findings": []}
+        return {"kind": "native_eth", "official": False,
+                "registry_status": registry.UNKNOWN,
+                "findings": [("currency_native", INFO,
+                              "auction is priced in native ETH")]}
     reg_status = RHJ_REGISTRY.status(currency)
     official = RHJ_REGISTRY.get(currency)
     facts = {
@@ -261,15 +296,22 @@ def build_factsheet(rpc: Rpc, launch: dict, current_block: Optional[int] = None)
     reserved_ratio = None
     if token_supply:
         reserved_ratio = p["reservedTokenAmountForLP"] / token_supply
-        if reserved_ratio < 0.05:
+        if reserved_ratio < 0.01:
+            findings.append((
+                "lp_reserve_negligible", FAIL,
+                "only %.2f%% of supply is reserved for liquidity, leaving the pool negligible against the rest of the supply"
+                % (reserved_ratio * 100),
+            ))
+        elif reserved_ratio < 0.05:
             findings.append((
                 "lp_reserve_thin", FLAG,
-                "only %.1f%% of supply reserved for LP" % (reserved_ratio * 100),
+                "only %.1f%% of supply is reserved for liquidity" % (reserved_ratio * 100),
             ))
 
     ceiling = PASS
     for _, severity, _ in findings:
-        ceiling = worse(ceiling, severity)
+        if affects_ceiling(severity):
+            ceiling = worse(ceiling, severity)
 
     return {
         "launch": launch,
