@@ -1,0 +1,104 @@
+{
+  "_note": [
+    "The posting deck. Card art and the post that carries it live in the",
+    "same record so they cannot drift apart — a card that says one number",
+    "and a tweet that says another is the fastest way to lose the only",
+    "thing this account is selling.",
+    "",
+    "Every figure here is checked against data/feed.json by",
+    "scripts/cards_build.py before a single PNG is written. If the record",
+    "moves, the build fails loudly rather than publishing a stale claim.",
+    "",
+    "'checks' is a list of [expression, expected] pairs evaluated against",
+    "the live feed. Add one for every number that appears in the copy."
+  ],
+  "cards": [
+    {
+      "slug": "record",
+      "headline": "512 launch auctions.",
+      "accent": "105 became pools.",
+      "subline": "Read directly off Robinhood Chain. No indexer in between.",
+      "checks": [
+        [
+          "total",
+          512
+        ],
+        [
+          "pool",
+          105
+        ]
+      ],
+      "post": "GAVEL is a verdict layer for launch auctions on Robinhood Chain.\n\n512 auctions have run through Uniswap's liquidity launcher. 105 became pools.\n\nWe read every one of them off the chain directly and publish what the parameters actually say.\n\nNo wallet connect. Nothing to approve."
+    },
+    {
+      "slug": "no-event",
+      "headline": "The chain emits no event",
+      "accent": "when nobody bids.",
+      "subline": "A failed auction and an abandoned one look identical from the logs.",
+      "checks": [],
+      "post": "Something we did not expect.\n\nWhen a launch auction draws no bids, the chain says nothing. No event. It just sits past its migration block in silence.\n\nWhich looks identical to an auction that cleared and was never migrated.\n\nTwo outcomes, one shape in the logs."
+    },
+    {
+      "slug": "not-neglect",
+      "headline": "386 auctions never cleared.",
+      "accent": "That is not neglect.",
+      "subline": "Nobody bid enough for there to be anything to migrate.",
+      "checks": [
+        [
+          "unfilled",
+          386
+        ],
+        [
+          "total",
+          512
+        ]
+      ],
+      "post": "We assumed the gap between 512 auctions and 105 pools was abandonment.\n\nIt is not.\n\nAsking each auction contract directly: 386 never reached a clearing price. Every auction that did clear was migrated. Not one was left sitting.\n\nMost launches simply draw no bids."
+    },
+    {
+      "slug": "no-custody",
+      "headline": "No wallet connect.",
+      "accent": "Nothing to approve.",
+      "subline": "GAVEL reads the chain. It never asks you for a signature.",
+      "checks": [],
+      "post": "GAVEL will never ask you to connect a wallet.\n\nThere is no approve step, no signature, no contract of ours you interact with. It reads public chain state and publishes what it finds.\n\nA tool that tells you what is safe should not itself be something you have to trust with funds."
+    },
+    {
+      "slug": "clamp",
+      "headline": "A model can lower a verdict.",
+      "accent": "It can never raise one.",
+      "subline": "The ceiling is arithmetic. Judgment only sits underneath it.",
+      "checks": [],
+      "post": "How GAVEL stops a language model talking a bad launch up.\n\nDeterministic checks compute a ceiling from chain state alone. The model reasons on top and may lower the verdict below it.\n\nIt cannot raise it. A launch that fails a hard check can never be argued into a PASS."
+    },
+    {
+      "slug": "recompute",
+      "headline": "Don't trust the verdict.",
+      "accent": "Recompute it.",
+      "subline": "Every check is deterministic. Every input is a public call.",
+      "checks": [],
+      "post": "Every verdict page lists the exact transaction, auction contract, token and recipient it was derived from.\n\nNot so the page looks thorough. So you can run the same calls and get the same answer without us.\n\nA number that cannot be reproduced from chain state should not be here."
+    },
+    {
+      "slug": "pass-is-not-safe",
+      "headline": "PASS does not mean safe.",
+      "accent": "It means nothing structural failed.",
+      "subline": "We can read the launch parameters. We cannot read intent.",
+      "checks": [],
+      "post": "Worth saying plainly, because the opposite reading is how people lose money.\n\nPASS means the deterministic checks found nothing structurally wrong with how the launch was configured.\n\nIt is not a price prediction, and not a claim the token is a good idea."
+    },
+    {
+      "slug": "live",
+      "headline": "14 auctions are open",
+      "accent": "right now.",
+      "subline": "The only page where a reader can still act on what it says.",
+      "checks": [
+        [
+          "live",
+          14
+        ]
+      ],
+      "post": "Every other page on GAVEL is a record of something already decided.\n\n/live is the one that matters while it still matters: auctions that have not passed their migration block, read straight from the chain in your browser.\n\nThe only page where you can still act on it."
+    }
+  ]
+}

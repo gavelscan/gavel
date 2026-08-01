@@ -1,0 +1,43 @@
+{
+  "_note": [
+    "Long-form pieces. Same contract as content/cards.json: the banner art,",
+    "the body, and the figures the body quotes live in one record, and",
+    "scripts/cards_build.py --articles refuses to render if the record has",
+    "moved underneath a number.",
+    "",
+    "Banners are 5:2 (2000x800) and share the statement card's room, face",
+    "and mark, so an article header and a post card read as the same hand."
+  ],
+  "articles": [
+    {
+      "slug": "no-event-when-nobody-bids",
+      "banner_headline": "The chain emits no event",
+      "banner_accent": "when nobody bids.",
+      "title": "The chain emits no event when nobody bids",
+      "subtitle": "Why 386 of 512 launch auctions on Robinhood Chain look abandoned, and are not.",
+      "checks": [
+        [
+          "total",
+          512
+        ],
+        [
+          "pool",
+          105
+        ],
+        [
+          "unfilled",
+          386
+        ],
+        [
+          "failed",
+          7
+        ],
+        [
+          "live",
+          14
+        ]
+      ],
+      "body": "Uniswap's liquidity launcher has run 512 launch auctions on Robinhood Chain. 105 of them became pools.\n\nThe obvious reading of that gap is neglect. Someone configures an auction, walks away, and the pool is never created. Nearly four hundred abandoned launches would say something fairly damning about the people using this launcher.\n\nThat reading is wrong, and finding out why took longer than it should have.\n\n## What the logs will and will not tell you\n\nA launch auction on this launcher emits `InitializerCreated` when it is set up. If it succeeds and the pool is created, it emits `Migrated`. If migration is attempted and reverts, it emits `MigrationFailed`.\n\nThere is no fourth event.\n\nAn auction that draws no bids does not announce it. It sits past its migration block in silence, and from the outside that silence is indistinguishable from an auction that cleared perfectly well and was simply never migrated. Same absence of `Migrated`, same absence of `MigrationFailed`, same nothing.\n\nSo a reader working purely from logs sees 512 launches, 105 pools, 7 explicit failures, and — setting aside the 14 still inside their auction window — 386 launches in a state the chain declines to describe. It is very easy to call that abandonment. It is the only word available if the logs are all you have.\n\n## Asking the contract instead\n\nThe auction initializer exposes `lbpInitializationParams()`. It reverts until a clearing price exists.\n\nThat revert is the missing event. It is not documented as a signal and it is not meant as one, but it separates the two cases cleanly: call it on an auction past its migration block, and a revert means no clearing price was ever reached — nobody bid enough for there to be anything to migrate. A successful return means the auction cleared and the pool creation is genuinely outstanding.\n\nWe called it on every launch in the record.\n\n| Outcome | Count |\n|---|---|\n| Never reached a clearing price | 386 |\n| Cleared and became a pool | 105 |\n| Migration attempted and failed | 7 |\n| Still in auction | 14 |\n| **Cleared but never migrated** | **0** |\n\nThat last row is the finding. Not one auction in the entire record cleared and was then left sitting. Every single auction that reached a clearing price was migrated.\n\nThe launcher is not being neglected. Most launches simply draw no bids.\n\n## Why this matters if you are the one bidding\n\nIt changes what the base rate is telling you.\n\nIf four hundred launches had been abandoned, the risk you would be pricing is operational — will this team actually finish. The evidence says that is not the risk. Teams finish. What they cannot do is make anyone show up.\n\nSo the number a bidder should care about is not \"will this migrate\" but \"will this clear at all\", and on current evidence roughly three in four do not. An auction that draws no bids is not a scandal and nobody loses funds to it. It is just the ordinary outcome, and any tool that reports it as failure-to-migrate is telling you the wrong thing about the wrong risk.\n\n## The general point\n\nThe absence of an event is not evidence of anything. It is the absence of evidence, and those are different in a way that matters when a reader is about to commit money.\n\nA chain will happily let you infer a story from what it did not say. Ours nearly published one: an early pass at this record labelled every silent launch as unmigrated, which was true in the narrowest sense and misleading in every sense that counts.\n\nThe fix was not a better heuristic. It was calling a function.\n\n---\n\nEvery figure here is recomputable. The record, with the exact transaction, auction contract, token and recipient behind each launch, is at gavelscan.xyz. GAVEL never asks you to connect a wallet."
+    }
+  ]
+}
