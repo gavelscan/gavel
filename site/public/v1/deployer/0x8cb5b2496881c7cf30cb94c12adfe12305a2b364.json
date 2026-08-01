@@ -1,1 +1,1 @@
-{"addr":"0x8cb5b2496881c7cf30cb94c12adfe12305a2b364","n":1,"pool":1,"failed":0,"live":0,"silent":0,"median_lp":0.5,"is_contract":false,"first_block":23401326,"last_block":23401326,"tokens":[{"sym":"Pools","ini":"0x80281ed133d623a6c42273a6643fc92f50e34492","state":"pool","ceiling":"FLAG"}]}
+{"addr":"0x8cb5b2496881c7cf30cb94c12adfe12305a2b364","n":1,"pool":1,"failed":0,"live":0,"silent":0,"median_lp":0.5,"is_contract":false,"first_block":23401326,"last_block":23401326,"tokens":[{"sym":"Pools","ini":"0x80281ed133d623a6c42273a6643fc92f50e34492","state":"pool","ceiling":"PASS"}]}

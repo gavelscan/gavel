@@ -1,1 +1,1 @@
-{"addr":"0xe62964b4fa846e8b0328870f2391a5fa6749307d","n":1,"pool":1,"failed":0,"live":0,"silent":0,"median_lp":5e-05,"is_contract":false,"first_block":8882561,"last_block":8882561,"tokens":[{"sym":"HAY","ini":"0xaa8ce1181c210c334bc852965dea58dcdc6de995","state":"pool","ceiling":"FLAG"}]}
+{"addr":"0xe62964b4fa846e8b0328870f2391a5fa6749307d","n":1,"pool":1,"failed":0,"live":0,"silent":0,"median_lp":5e-05,"is_contract":false,"first_block":8882561,"last_block":8882561,"tokens":[{"sym":"HAY","ini":"0xaa8ce1181c210c334bc852965dea58dcdc6de995","state":"pool","ceiling":"FAIL"}]}

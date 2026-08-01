@@ -21,7 +21,7 @@ const ENTRIES: Entry[] = [
     date: "2026-08-01",
     kind: "correction",
     head: "The verdict said FLAG about almost everything, which is the same as saying nothing",
-    body: "Under the first calibration 87% of the record sat below PASS, and the reason was a single check: paying an ordinary wallet was treated as a warning, when 85% of launches do exactly that. A signal that fires on five launches in six is not a signal. Findings now carry an INFO severity that is published but moves nothing, warnings are reserved for what is actually unusual — a recipient wallet with almost no history, a raise that routes less than half of itself to liquidity — and FAIL for what is structural, like a schedule that sends the money past liquidity entirely. Measured across the whole record the split is now roughly four in five PASS, one in six FLAG, and a handful of FAIL. A verdict layer should be quiet like a smoke alarm, not loud like a car alarm.",
+    body: "Under the first calibration 87% of the record sat below PASS, and the reason was a single check: paying an ordinary wallet was treated as a warning, when 85% of launches do exactly that. A signal that fires on five launches in six is not a signal. Findings now carry an INFO severity that is published but moves nothing, warnings are reserved for what is actually unusual — a recipient wallet with almost no history, a raise that routes less than half of itself to liquidity — and FAIL for what is structural, like a schedule that sends the money past liquidity entirely. Measured across the whole record of 462 launches the split is now 380 PASS, 72 FLAG and 10 FAIL. A verdict layer should be quiet like a smoke alarm, not loud like a car alarm.",
   },
   {
     date: "2026-08-01",

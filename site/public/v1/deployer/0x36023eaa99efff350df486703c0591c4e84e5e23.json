@@ -1,1 +1,1 @@
-{"addr":"0x36023eaa99efff350df486703c0591c4e84e5e23","n":1,"pool":1,"failed":0,"live":0,"silent":0,"median_lp":0.5,"is_contract":false,"first_block":17629746,"last_block":17629746,"tokens":[{"sym":"LAND","ini":"0x8a4e90853407adf4bdad42a6df122e751185502a","state":"pool","ceiling":"FLAG"}]}
+{"addr":"0x36023eaa99efff350df486703c0591c4e84e5e23","n":1,"pool":1,"failed":0,"live":0,"silent":0,"median_lp":0.5,"is_contract":false,"first_block":17629746,"last_block":17629746,"tokens":[{"sym":"LAND","ini":"0x8a4e90853407adf4bdad42a6df122e751185502a","state":"pool","ceiling":"PASS"}]}
