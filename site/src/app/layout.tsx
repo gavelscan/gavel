@@ -29,12 +29,12 @@ const mono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gavelscan.xyz"),
-  title: "GAVEL — the verdict layer for onchain launch auctions",
+  title: "GAVEL",
   description:
     "Every launch auction on Robinhood Chain, read before the money moves. One verdict per launch: PASS, FLAG or FAIL.",
   icons: { icon: "/brand/favicon.ico" },
   openGraph: {
-    title: "GAVEL — the verdict layer for onchain launch auctions",
+    title: "GAVEL",
     description:
       "Every launch auction on Robinhood Chain, read before the money moves.",
     type: "website",
