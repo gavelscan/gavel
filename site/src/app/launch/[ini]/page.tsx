@@ -6,6 +6,7 @@ import {
   CEILING_TONE,
   ROWS,
   actionLink,
+  rankFindings,
   STATE_LABEL,
   STATE_TONE,
   pct,
@@ -164,7 +165,7 @@ export default async function LaunchPage({
             </p>
           ) : (
             <ul className="border-t border-hairline">
-              {row.findings.map((f) => (
+              {rankFindings(row.findings).map((f) => (
                 <li
                   key={f.k}
                   className="grid gap-2 border-b border-hairline py-5 sm:grid-cols-[7rem_1fr] sm:gap-6"

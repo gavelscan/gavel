@@ -16,6 +16,7 @@ import {
   CEILING_TONE,
   LaunchRow,
   actionLink,
+  rankFindings,
   pct,
   safeSymbol,
   shortAddr,
@@ -172,7 +173,7 @@ export default function LiveBoard({
 
                   {r.findings.length > 0 && (
                     <p className="mt-5 border-t border-hairline pt-4 text-[13.5px] text-ink-soft">
-                      {r.findings[0].d}
+                      {rankFindings(r.findings)[0].d}
                     </p>
                   )}
                 </Link>

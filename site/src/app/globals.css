@@ -314,6 +314,22 @@ body {
   }
 }
 
+/* The incoming half of a split-flap: hinged at the top, dropping into
+   place. Paired with the outgoing half falling away in SplitFlap.tsx. */
+@keyframes gavel-flap {
+  0% {
+    transform: translateY(60%) rotateX(80deg);
+    opacity: 0;
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) rotateX(0deg);
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

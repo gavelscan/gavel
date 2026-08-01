@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Counters from "@/components/Counters";
 import LaunchField from "@/components/LaunchField";
 import Reveal from "@/components/Reveal";
 import hero from "./launches.json";
@@ -136,23 +137,14 @@ export default function Home() {
             </p>
           </Reveal>
 
-          <div className="mt-16 grid gap-px border border-hairline bg-hairline sm:grid-cols-4">
-            {[
-              ["Archived events", HERO.events.toLocaleString("en-US")],
-              ["Launch auctions", String(TOTAL)],
-              ["Token-paired", String(TOKEN_PAIRED)],
-              ["Drew no bids", String(UNFILLED)],
-            ].map(([label, value], i) => (
-              <Reveal key={label} delay={i * 0.06} className="bg-paper">
-                <div className="p-6">
-                  <div className="data text-[clamp(1.8rem,3vw,2.6rem)] leading-none">
-                    {value}
-                  </div>
-                  <div className="eyebrow mt-3">{label}</div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
+          <Counters
+            seed={{
+              events: HERO.events,
+              total: TOTAL,
+              tokenPaired: TOKEN_PAIRED,
+              unfilled: UNFILLED,
+            }}
+          />
         </div>
       </section>
 
