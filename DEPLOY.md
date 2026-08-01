@@ -32,6 +32,7 @@ python3 scripts/build_feed.py          # rebuild the feed + deployer index
 cp data/feed.json site/src/app/feed.json
 cp data/deployers.json site/src/app/deployers.json
 python3 scripts/build_api.py           # rewrite site/public/v1
+python3 scripts/build_hero.py          # homepage figures and hero field
 ```
 
 Or run all of it with one command:

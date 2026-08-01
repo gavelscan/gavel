@@ -15,11 +15,11 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import launches from "@/app/launches.json";
+import hero from "@/app/launches.json";
 
 type Row = { b: number; s: "pool" | "failed" | "live" | "unfilled"; c: number; lp: number };
 
-const DATA = launches as Row[];
+const DATA = (hero as { launches: Row[] }).launches;
 
 const COLS = 33;
 const GAP = 1.28;

@@ -23,7 +23,20 @@ echo $$ > data/.refresh.pid
 trap 'rm -f data/.refresh.pid' EXIT
 
 # Local config (extra RPC endpoints, keys) lives in a gitignored .env.
-if [ -f .env ]; then set -a; . ./.env; set +a; fi
+# Read as data, not sourced: values legitimately contain characters the
+# shell would try to interpret, and a config file should never be able to
+# run commands.
+if [ -f .env ]; then
+  while IFS= read -r line; do
+    case "$line" in ''|'#'*) continue ;; esac
+    key=${line%%=*}
+    val=${line#*=}
+    case "$key" in *[!A-Za-z0-9_]*) continue ;; esac
+    val=${val%\"}; val=${val#\"}
+    val=${val%\'}; val=${val#\'}
+    export "$key=$val"
+  done < .env
+fi
 
 say() { echo "$(date -u +%FT%TZ) $*"; }
 
@@ -41,9 +54,10 @@ python3 scripts/build_deployers.py
 cp data/feed.json site/src/app/feed.json
 cp data/deployers.json site/src/app/deployers.json
 python3 scripts/build_api.py
+python3 scripts/build_hero.py
 
 git add site/src/app/feed.json site/src/app/deployers.json \
-        site/public/v1 gavel/rhj_registry.json
+        site/src/app/launches.json site/public/v1 gavel/rhj_registry.json
 if git diff --cached --quiet; then
   say "no change at this block; nothing to publish"
   exit 0

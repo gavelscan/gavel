@@ -47,13 +47,15 @@ jobs:
           cp data/feed.json site/src/app/feed.json
           cp data/deployers.json site/src/app/deployers.json
           python scripts/build_api.py
+          python scripts/build_hero.py
 
       - name: Commit only if the record actually moved
         run: |
           git config user.name  "gavelscan"
           git config user.email "gavelscan@users.noreply.github.com"
           git add site/src/app/feed.json site/src/app/deployers.json \
-                  site/public/v1 gavel/rhj_registry.json
+                  site/src/app/launches.json site/public/v1 \
+                  gavel/rhj_registry.json
           if git diff --cached --quiet; then
             echo "no change at this block; nothing to publish"
             exit 0

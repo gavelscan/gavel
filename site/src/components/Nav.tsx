@@ -88,7 +88,7 @@ function age(blocks: number) {
 }
 
 /**
- * Freshness, not liveness.
+ * Freshness of the page you are actually on.
  *
  * Showing the live chain head alone was quietly misleading: the pages are
  * built from a snapshot, so a reader saw a number ticking up and assumed
@@ -98,20 +98,31 @@ function age(blocks: number) {
  */
 function BlockChip({ className = "" }: { className?: string }) {
   const { block, failed, pending } = useBlockHeight();
+  const pathname = usePathname();
+  // The live board re-reads the chain in the browser, so reporting the
+  // build's age beside it was two numbers contradicting each other on one
+  // page — the bar calling stale what the page had already refreshed.
+  const readsLive = pathname.startsWith("/live");
   const gap = block === null ? null : Math.max(0, block - FEED.head);
-  const stale = gap !== null && gap > 7200; // ~30 minutes
+  const stale = !readsLive && gap !== null && gap > 7200; // ~30 minutes
 
   const label = failed
     ? "CHAIN UNREACHABLE"
     : pending
-      ? `DATA AT ${FEED.head.toLocaleString("en-US")}`
-      : `DATA AT ${FEED.head.toLocaleString("en-US")} · ${age(gap!)}`;
+      ? readsLive
+        ? "READING CHAIN…"
+        : `DATA AT ${FEED.head.toLocaleString("en-US")}`
+      : readsLive
+        ? `LIVE · BLOCK ${block!.toLocaleString("en-US")}`
+        : `DATA AT ${FEED.head.toLocaleString("en-US")} · ${age(gap!)}`;
 
   const tone = failed
     ? "var(--fail)"
-    : stale
-      ? "var(--brass)"
-      : "var(--ink-soft)";
+    : readsLive
+      ? "var(--pass)"
+      : stale
+        ? "var(--brass)"
+        : "var(--ink-soft)";
 
   return (
     <span
@@ -122,7 +133,9 @@ function BlockChip({ className = "" }: { className?: string }) {
           ? "Could not reach a Robinhood Chain RPC"
           : block === null
             ? undefined
-            : `Chain head ${block.toLocaleString("en-US")}; this build was read at ${FEED.head.toLocaleString("en-US")}`
+            : readsLive
+              ? `This page re-reads the chain directly; parameters come from the build at ${FEED.head.toLocaleString("en-US")}`
+              : `Chain head ${block.toLocaleString("en-US")}; this build was read at ${FEED.head.toLocaleString("en-US")}`
       }
     >
       <span

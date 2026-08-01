@@ -1,10 +1,11 @@
 import Image from "next/image";
 import LaunchField from "@/components/LaunchField";
 import Reveal from "@/components/Reveal";
-import launches from "./launches.json";
+import hero from "./launches.json";
 
 type Row = { s: "pool" | "failed" | "live" | "unfilled"; c: number };
-const DATA = launches as Row[];
+const HERO = hero as { head: number; events: number; launches: Row[] };
+const DATA = HERO.launches;
 const count = (s: Row["s"]) => DATA.filter((d) => d.s === s).length;
 
 const TOTAL = DATA.length;
@@ -137,7 +138,7 @@ export default function Home() {
 
           <div className="mt-16 grid gap-px border border-hairline bg-hairline sm:grid-cols-4">
             {[
-              ["Archived events", "2,550"],
+              ["Archived events", HERO.events.toLocaleString("en-US")],
               ["Launch auctions", String(TOTAL)],
               ["Token-paired", String(TOKEN_PAIRED)],
               ["Drew no bids", String(UNFILLED)],

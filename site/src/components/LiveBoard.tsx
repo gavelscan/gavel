@@ -81,7 +81,7 @@ export default function LiveBoard({
             ? "CHAIN UNREACHABLE — SHOWING THE LAST BUILD"
             : head === null
               ? "READING THE CHAIN…"
-              : `READ FROM THE CHAIN AT BLOCK ${head.toLocaleString("en-US")}`}
+              : "OPEN OR CLOSED IS RE-READ FROM THE CHAIN, NOT FROM THE BUILD"}
         </p>
 
         {closedSinceBuild > 0 && !error && (

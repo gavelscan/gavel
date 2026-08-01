@@ -145,60 +145,61 @@ def main():
                 # the record; if we have nothing, leave it out of this
                 # build and say so, but never write a guess.
                 print("  unresolved %s: %s" % (ini[:10], str(e)[:70]), flush=True)
-                unresolved.append(ini)
+                unresolved.append(launch)
                 continue
             time.sleep(0.05)
         rows.append(row)
 
-    if skipped:
-        print("retrying %d deferred launch(es)" % len(skipped), flush=True)
-        still = []
-        for launch, _ in skipped:
+    # A transient node failure must not quietly shrink the record, so every
+    # deferred launch gets one more attempt before the build is written.
+    still_absent = []
+    if unresolved:
+        print("retrying %d deferred launch(es)" % len(unresolved), flush=True)
+        for launch in unresolved:
             ini = launch["initializer"].lower()
+            p2 = launch["params"]
             try:
                 sheet = build_factsheet(rpc, launch, current_block=head)
                 outcome = rpc.auction_outcome(launch["initializer"])
-                p2 = launch["params"]
-                cache[ini] = {
-                    "ini": launch["initializer"], "tx": launch["tx"],
-                    "block": launch["block"], "token": p2["token"],
-                    "sym": rpc.read_string(p2["token"], Rpc.SEL_SYMBOL),
-                    "currency": p2["currency"],
-                    "cur_sym": ("ETH" if p2["currency"] == ZERO_ADDRESS
-                                else rpc.read_string(p2["currency"], Rpc.SEL_SYMBOL)),
-                    "cur_official": bool(sheet["currency"].get("official")),
-                    "recipient": p2["recipient"],
-                    "rec_code": sheet["recipient"]["code_size"],
-                    "rec_nonce": sheet["recipient"]["nonce"],
-                    "lp_ratio": sheet["reserved_lp_ratio"],
-                    "fee": p2["pool"]["fee"], "hook": p2["pool"]["hook"],
-                    "migration_block": p2["migrationBlock"],
-                    "cleared": outcome["cleared"], "sold": outcome["sold"],
-                    "raised": outcome["raised"], "ceiling": sheet["ceiling"],
-                    "findings": [{"k": k, "s": sv, "d": d}
-                                 for k, sv, d in sheet["findings"]],
-                    "state": ("unfilled" if p2["migrationBlock"] < head
-                              and not outcome["cleared"] else "silent"),
-                }
-                rows.append(cache[ini])
-            except RpcError as e:
-                still.append((launch, str(e)))
-        if still:
-            # Loud, because a launch missing from the record is the one
-            # failure this project cannot afford to shrug at.
-            print("WARNING: %d launch(es) unreadable this run and absent from "
-                  "the build; they will be retried next run" % len(still),
-                  flush=True)
+            except RpcError:
+                still_absent.append(ini)
+                continue
+            base = "live" if p2["migrationBlock"] >= head else "silent"
+            cache[ini] = {
+                "ini": launch["initializer"], "tx": launch["tx"],
+                "block": launch["block"], "token": p2["token"],
+                "sym": rpc.read_string(p2["token"], Rpc.SEL_SYMBOL),
+                "currency": p2["currency"],
+                "cur_sym": ("ETH" if p2["currency"] == ZERO_ADDRESS
+                            else rpc.read_string(p2["currency"], Rpc.SEL_SYMBOL)),
+                "cur_official": bool(sheet["currency"].get("official")),
+                "recipient": p2["recipient"],
+                "rec_code": sheet["recipient"]["code_size"],
+                "rec_nonce": sheet["recipient"]["nonce"],
+                "lp_ratio": sheet["reserved_lp_ratio"],
+                "fee": p2["pool"]["fee"], "hook": p2["pool"]["hook"],
+                "migration_block": p2["migrationBlock"],
+                "cleared": outcome["cleared"], "sold": outcome["sold"],
+                "raised": outcome["raised"], "ceiling": sheet["ceiling"],
+                "findings": [{"k": k, "s": sv, "d": d}
+                             for k, sv, d in sheet["findings"]],
+                "state": ("unfilled" if base == "silent"
+                          and not outcome["cleared"] else base),
+            }
+            rows.append(cache[ini])
 
     save_cache(cache)
     rows.sort(key=lambda r: -r["block"])
     with open(OUT, "w") as f:
         json.dump({"head": head, "rows": rows}, f, separators=(",", ":"))
     print("wrote %s: %d rows" % (OUT, len(rows)))
-    if unresolved:
-        print("%d launches could not be read this run and kept their last "
-              "published values or were skipped: %s"
-              % (len(unresolved), ", ".join(a[:10] for a in unresolved[:5])))
+    if still_absent:
+        # Loud, because a launch missing from the record is the one failure
+        # this project cannot afford to shrug at.
+        print("WARNING: %d launch(es) unreadable after a retry and absent "
+              "from this build; they will be attempted again next run: %s"
+              % (len(still_absent), ", ".join(a[:10] for a in still_absent[:5])),
+              flush=True)
 
 
 if __name__ == "__main__":
