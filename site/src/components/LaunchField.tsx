@@ -167,7 +167,7 @@ export default function LaunchField({
   }, []);
 
   return (
-    <div ref={host} className="relative h-[230vh]">
+    <div ref={host} data-hero className="relative h-[230vh]">
       <div className="sticky top-0 h-screen overflow-hidden bg-slate">
         {reduced ? (
           <StaticFallback />

@@ -74,20 +74,7 @@ export default function Home() {
               "linear-gradient(to top, rgba(14,17,19,.92), rgba(14,17,19,0))",
           }}
         />
-        <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-6 sm:p-10">
-          <div className="flex items-center gap-3">
-            <Image
-              src="/brand/gavel-mark-tight.png"
-              alt=""
-              width={34}
-              height={34}
-              priority
-            />
-            <span className="data text-[11px] tracking-[0.22em] text-brass-soft">
-              GAVELSCAN
-            </span>
-          </div>
-
+        <div className="pointer-events-none absolute inset-0 flex flex-col justify-end gap-10 p-6 pb-6 sm:p-10">
           <div className="max-w-[46rem]">
             <p className="eyebrow mb-5 !text-brass">
               Robinhood Chain · Uniswap Liquidity Launcher

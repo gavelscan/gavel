@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Newsreader, Instrument_Sans, JetBrains_Mono } from "next/font/google";
+import Nav from "@/components/Nav";
 import "./globals.css";
 
 /* Display: a reading serif with real character — the register of a written
@@ -49,7 +50,10 @@ export default function RootLayout({
       lang="en"
       className={`${newsreader.variable} ${instrument.variable} ${mono.variable} h-full`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <Nav />
+        {children}
+      </body>
     </html>
   );
 }
