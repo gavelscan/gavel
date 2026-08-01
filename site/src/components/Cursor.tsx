@@ -78,7 +78,7 @@ export default function Cursor() {
       // The nib itself lags very slightly, the way a hand does.
       px += (x - px) * 0.35;
       py += (y - py) * 0.35;
-      const scale = down ? 0.72 : over ? 1.9 : 1;
+      const scale = down ? 0.75 : over ? 1.15 : 1;
       el.style.transform = `translate3d(${px - 9}px, ${py - 9}px, 0) scale(${scale})`;
       el.style.opacity = x < 0 ? "0" : "1";
       el.dataset.over = String(over);
@@ -131,11 +131,9 @@ export default function Cursor() {
         aria-hidden
         className="nib pointer-events-none fixed left-0 top-0 z-[91] hidden h-[18px] w-[18px] [.has-nib_&]:block [.nib-off_&]:hidden"
       >
-        {/* The nib: a short stroke at a writing angle, opening into a
-            bracket over anything you can act on. */}
+        {/* One mark, held at a writing angle. It brightens over anything
+            interactive; the element itself does the announcing. */}
         <span className="nib-stroke" />
-        <span className="nib-bracket nib-bracket-l" />
-        <span className="nib-bracket nib-bracket-r" />
       </div>
     </>
   );

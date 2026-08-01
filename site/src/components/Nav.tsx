@@ -244,13 +244,12 @@ export default function Nav() {
               <Link
                 key={l.href}
                 href={l.href}
-                className="data text-[12px] tracking-[0.1em] transition-opacity hover:opacity-100"
+                className="navlink data text-[12px] tracking-[0.1em]"
+                data-active={active}
                 style={{
-                  color: mix(
-                    "#cbbfa8",
-                    active ? "var(--brass)" : "var(--ink-soft)",
-                  ),
-                  opacity: active ? 1 : 0.85,
+                  color: active
+                    ? mix("#e0cf9a", "var(--brass)")
+                    : mix("#cbbfa8", "var(--ink-soft)"),
                 }}
               >
                 {l.label}
@@ -266,7 +265,7 @@ export default function Nav() {
             <Link
               key={l.href}
               href={l.href}
-              className="data text-[12px] tracking-[0.1em] opacity-70 transition-opacity hover:opacity-100"
+              className="navlink data text-[12px] tracking-[0.1em] opacity-75"
               style={{ color: mix("#cbbfa8", "var(--ink-soft)") }}
             >
               {l.label}

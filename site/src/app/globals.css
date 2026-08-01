@@ -240,8 +240,7 @@ body {
   will-change: transform;
   transition: opacity 0.2s ease;
 }
-.nib-stroke,
-.nib-bracket {
+.nib-stroke {
   position: absolute;
   display: block;
   background: var(--brass-bright);
@@ -258,28 +257,36 @@ body {
   transform: rotate(38deg);
   transform-origin: 50% 100%;
 }
-/* Active: the stroke retracts and two rules open around the target. */
+/* Active: the mark simply brightens and tightens. Nothing is drawn
+   around the target — the target itself lights up. */
 .nib[data-over="true"] .nib-stroke {
-  opacity: 0;
-  transform: rotate(38deg) scaleY(0.2);
+  height: 9px;
+  top: 5px;
+  background: var(--brass-bright);
+  box-shadow: 0 0 6px rgba(185, 141, 43, 0.6);
 }
-.nib-bracket {
-  top: 4px;
-  width: 1.5px;
-  height: 10px;
-  opacity: 0;
+
+/* Interactive text announces itself: brass, with a rule drawn under it
+   the way a reader underlines a line worth returning to. */
+.navlink {
+  position: relative;
+  transition: color 0.25s ease;
 }
-.nib-bracket-l {
-  left: 3px;
-  transform: translateX(4px);
+.navlink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  background: var(--brass-bright);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.nib-bracket-r {
-  left: 13px;
-  transform: translateX(-4px);
-}
-.nib[data-over="true"] .nib-bracket {
-  opacity: 1;
-  transform: translateX(0);
+.navlink:hover::after,
+.navlink[data-active="true"]::after {
+  transform: scaleX(1);
 }
 
 @media (prefers-reduced-motion: reduce) {
