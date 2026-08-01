@@ -1,0 +1,13 @@
+# Generated data: the static API and the site's data snapshots are written
+# by scripts/, not edited. Keeping them out of the language stats and out
+# of diffs makes the repo read as what it is — a Python codebase with a
+# Next.js site attached.
+site/public/v1/**            linguist-generated=true
+site/src/app/feed.json       linguist-generated=true
+site/src/app/deployers.json  linguist-generated=true
+site/src/app/launches.json   linguist-generated=true
+gavel/rhj_registry.json      linguist-generated=true
+tests/fixtures/**            linguist-vendored=true
+
+# Preview sheets are documentation, not shipped source.
+brand/*.html                 linguist-documentation=true
