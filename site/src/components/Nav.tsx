@@ -19,8 +19,16 @@ import { useCallback, useEffect, useState } from "react";
 const RPC = "https://rpc.mainnet.chain.robinhood.com";
 
 const LINKS = [
-  { href: "/launches", label: "Launches" },
+  { href: "/live", label: "Live" },
+  { href: "/launches", label: "Record" },
+  { href: "/deployers", label: "Deployers" },
   { href: "/method", label: "Method" },
+];
+
+/* Secondary destinations: real, but not what a reader arrives for. */
+const SECONDARY = [
+  { href: "/api-docs", label: "API" },
+  { href: "/changelog", label: "Changelog" },
 ];
 
 function useBlockHeight() {
@@ -198,7 +206,7 @@ export default function Nav() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(180deg, rgba(14,17,19,.92) 0%, rgba(14,17,19,.6) 62%, rgba(14,17,19,0) 100%)",
+            "linear-gradient(180deg, rgba(23,19,14,.94) 0%, rgba(23,19,14,.62) 62%, rgba(23,19,14,0) 100%)",
         }}
       />
       <div
@@ -229,7 +237,7 @@ export default function Nav() {
         </Link>
 
         {/* Desktop and tablet */}
-        <nav className="hidden items-center gap-7 md:flex">
+        <nav className="hidden items-center gap-6 lg:flex">
           {LINKS.map((l) => {
             const active = pathname.startsWith(l.href);
             return (
@@ -239,7 +247,7 @@ export default function Nav() {
                 className="data text-[12px] tracking-[0.1em] transition-opacity hover:opacity-100"
                 style={{
                   color: mix(
-                    "#c9ccd1",
+                    "#cbbfa8",
                     active ? "var(--brass)" : "var(--ink-soft)",
                   ),
                   opacity: active ? 1 : 0.85,
@@ -252,7 +260,22 @@ export default function Nav() {
           <span
             aria-hidden
             className="h-4 w-px"
-            style={{ background: mix("#2a2e33", "var(--hairline)") }}
+            style={{ background: mix("#33291d", "var(--hairline)") }}
+          />
+          {SECONDARY.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className="data text-[12px] tracking-[0.1em] opacity-70 transition-opacity hover:opacity-100"
+              style={{ color: mix("#cbbfa8", "var(--ink-soft)") }}
+            >
+              {l.label}
+            </Link>
+          ))}
+          <span
+            aria-hidden
+            className="h-4 w-px"
+            style={{ background: mix("#33291d", "var(--hairline)") }}
           />
           <span style={{ opacity: t }}>
             <BlockChip />
@@ -266,9 +289,9 @@ export default function Nav() {
           aria-expanded={open}
           aria-controls="nav-sheet"
           aria-label={open ? "Close menu" : "Open menu"}
-          className="-mr-2 grid h-11 w-11 place-items-center md:hidden"
+          className="-mr-2 grid h-11 w-11 place-items-center lg:hidden"
         >
-          <MenuIcon open={open} tone={mix("#e2ded4", "var(--ink)")} />
+          <MenuIcon open={open} tone={mix("#efe8da", "var(--ink)")} />
         </button>
       </div>
 
@@ -276,9 +299,9 @@ export default function Nav() {
           page, so the bar and the menu stay one object. */}
       <div
         id="nav-sheet"
-        className="relative overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden"
+        className="relative overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] lg:hidden"
         style={{
-          maxHeight: open ? 300 : 0,
+          maxHeight: open ? 560 : 0,
           opacity: open ? 1 : 0,
           background: "var(--paper)",
           borderBottom: open ? "1px solid var(--hairline)" : "none",
@@ -292,16 +315,26 @@ export default function Nav() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="display border-b border-hairline py-4 text-[1.7rem]"
+                className="display border-b border-hairline py-3.5 text-[1.5rem]"
                 style={{ color: active ? "var(--brass)" : "var(--ink)" }}
               >
                 {l.label}
               </Link>
             );
           })}
+          {SECONDARY.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={() => setOpen(false)}
+              className="data border-b border-hairline py-3.5 text-[12px] tracking-[0.12em] text-ink-soft"
+            >
+              {l.label.toUpperCase()}
+            </Link>
+          ))}
           <a
             href="https://github.com/gavelscan/gavel"
-            className="data border-b border-hairline py-4 text-[12px] tracking-[0.12em] text-ink-soft"
+            className="data border-b border-hairline py-3.5 text-[12px] tracking-[0.12em] text-ink-soft"
           >
             SOURCE ↗
           </a>

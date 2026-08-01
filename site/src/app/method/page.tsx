@@ -82,17 +82,17 @@ export default function Method() {
 
       <section className="bg-slate-glow grain px-6 py-24 sm:px-10 sm:py-32">
         <div className="mx-auto max-w-6xl">
-          <p className="eyebrow mb-8 !text-[#8f949b]">What is guaranteed</p>
-          <dl className="border-t border-[#2a2e33]">
+          <p className="eyebrow mb-8 !text-[#a2937c]">What is guaranteed</p>
+          <dl className="border-t border-[#33291d]">
             {GUARANTEES.map(([term, def]) => (
               <div
                 key={term}
-                className="grid gap-3 border-b border-[#2a2e33] py-7 md:grid-cols-[22rem_1fr] md:gap-10"
+                className="grid gap-3 border-b border-[#33291d] py-7 md:grid-cols-[22rem_1fr] md:gap-10"
               >
-                <dt className="display text-[1.35rem] text-[#f2efe7]">
+                <dt className="display text-[1.35rem] text-[#efe8da]">
                   {term}
                 </dt>
-                <dd className="text-[15.5px] text-[#9aa0a8]">{def}</dd>
+                <dd className="text-[15.5px] text-[#a99a84]">{def}</dd>
               </div>
             ))}
           </dl>
@@ -107,13 +107,13 @@ export default function Method() {
             </Link>
             <a
               href="https://github.com/gavelscan/gavel"
-              className="data text-[12px] text-[#8f949b] transition-colors hover:text-brass"
+              className="data text-[12px] text-[#a2937c] transition-colors hover:text-brass"
             >
               the checks, in full, on github
             </a>
           </div>
 
-          <p className="data mt-16 max-w-[64ch] text-[11px] leading-relaxed text-[#5f656c]">
+          <p className="data mt-16 max-w-[64ch] text-[11px] leading-relaxed text-[#7d7263]">
             What GAVEL cannot see: intent. It reads parameters and provenance.
             A launch that passes every check can still fail, and a flagged
             launch is not an accusation of fraud — it is a statement that

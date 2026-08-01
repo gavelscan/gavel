@@ -30,10 +30,10 @@ const BAR_W = 0.44;
    97 read as the majority. Colour carries the outcome; the grey crowd is
    supposed to dominate, because it does. */
 const TONE: Record<Row["s"], string> = {
-  silent: "#464b52", // never became a pool — the bulk
+  silent: "#4a443a", // never became a pool — the bulk
   pool: "#b98d2b", // brass: migrated, liquidity exists
   failed: "#b3372f",
-  live: "#e8e4da", // still inside its auction window
+  live: "#efe8da", // still inside its auction window
 };
 
 const HEIGHT: Record<Row["s"], number> = {
@@ -177,8 +177,8 @@ export default function LaunchField({
             camera={{ position: [0, 1.1, 21], fov: 42 }}
             gl={{ antialias: true }}
           >
-            <color attach="background" args={["#0e1113"]} />
-            <fog attach="fog" args={["#0e1113", 20, 62]} />
+            <color attach="background" args={["#17130e"]} />
+            <fog attach="fog" args={["#17130e", 20, 62]} />
             <ambientLight intensity={0.55} />
             <directionalLight position={[6, 14, 8]} intensity={1.5} />
             <directionalLight position={[-8, 4, -6]} intensity={0.4} color="#b98d2b" />

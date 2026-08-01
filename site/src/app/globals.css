@@ -1,16 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  /* Paper stock, not cream. This is a record, not a mood board. */
-  --paper: #f8f8f6;
-  --paper-sunk: #f1f0ec;
-  --ink: #14161a;
-  --ink-soft: #5f636a;
-  --hairline: #e0ddd3;
+  /* Aged archive stock. Not office white — this is a record that has been
+     sitting in a drawer, and the warmth is what separates it from every
+     other light-mode site. */
+  --paper: #e9e3d5;
+  --paper-raised: #f1ece1;
+  --paper-sunk: #dcd4c2;
+  --ink: #191512;
+  --ink-soft: #6b6153;
+  --hairline: #d2c9b4;
 
   /* Locked brand */
-  --slate: #0e1113;
-  --brass: #b98d2b;
+  --slate: #17130e; /* ink-brown, not blue-black: it must sit beside parchment */
+  --brass: #9a7420;      /* darkened for contrast on parchment */
+  --brass-bright: #b98d2b; /* the mark's own gold, for dark surfaces */
   --brass-soft: #d8c9a0;
 
   /* Verdict states — the only other colours permitted anywhere */
@@ -21,12 +25,14 @@
 
 @theme inline {
   --color-paper: var(--paper);
+  --color-paper-raised: var(--paper-raised);
   --color-paper-sunk: var(--paper-sunk);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-hairline: var(--hairline);
   --color-slate: var(--slate);
   --color-brass: var(--brass);
+  --color-brass-bright: var(--brass-bright);
   --color-brass-soft: var(--brass-soft);
   --color-pass: var(--pass);
   --color-flag: var(--flag);
@@ -102,35 +108,38 @@ body {
    Every gradient stays inside the brand family: slate, brass, paper.
    Depth comes from light, not from new colours. */
 
-/* Paper with a warm wash rising from the corners — a page under a lamp. */
+/* Parchment under a lamp: light from one corner, a second from the far
+   side, and a vignette so the sheet reads as a sheet instead of a fill. */
 .bg-paper-warm {
   background:
-    radial-gradient(120% 90% at 85% -10%, rgba(185, 141, 43, 0.09), transparent 55%),
-    radial-gradient(90% 70% at -10% 110%, rgba(185, 141, 43, 0.06), transparent 50%),
-    linear-gradient(180deg, var(--paper) 0%, var(--paper-sunk) 100%);
+    radial-gradient(120% 90% at 88% -12%, rgba(154, 116, 32, 0.16), transparent 56%),
+    radial-gradient(95% 75% at -12% 108%, rgba(154, 116, 32, 0.11), transparent 52%),
+    radial-gradient(140% 100% at 50% 50%, transparent 42%, rgba(70, 58, 38, 0.09) 100%),
+    linear-gradient(168deg, var(--paper-raised) 0%, var(--paper) 55%, var(--paper-sunk) 100%);
 }
 
-/* Sunk paper with the wash reversed, so alternating sections breathe. */
+/* The lamp moved to the other side, so consecutive sheets never repeat. */
 .bg-paper-sunk-warm {
   background:
-    radial-gradient(110% 80% at 10% -15%, rgba(185, 141, 43, 0.08), transparent 52%),
-    linear-gradient(180deg, var(--paper-sunk) 0%, var(--paper) 100%);
+    radial-gradient(110% 80% at 8% -14%, rgba(154, 116, 32, 0.14), transparent 54%),
+    radial-gradient(130% 95% at 50% 55%, transparent 45%, rgba(70, 58, 38, 0.08) 100%),
+    linear-gradient(192deg, var(--paper-sunk) 0%, var(--paper) 60%, var(--paper-raised) 100%);
 }
 
 /* Instrument dark: slate lit from below by a brass horizon. */
 .bg-slate-glow {
   background:
-    radial-gradient(90% 75% at 50% 115%, rgba(185, 141, 43, 0.22), transparent 60%),
-    radial-gradient(60% 45% at 82% -10%, rgba(185, 141, 43, 0.10), transparent 55%),
-    linear-gradient(180deg, var(--slate) 0%, #101316 55%, #15181c 100%);
+    radial-gradient(90% 75% at 50% 118%, rgba(203, 161, 58, 0.2), transparent 60%),
+    radial-gradient(60% 45% at 84% -10%, rgba(203, 161, 58, 0.09), transparent 55%),
+    linear-gradient(180deg, #17130e 0%, #1d1811 58%, #14100c 100%);
 }
 
 /* Footer continues exactly where the dark section leaves off, so the
    two dark rooms read as one space with the lamp lower down. */
 .bg-slate-glow-deep {
   background:
-    radial-gradient(85% 70% at 50% 120%, rgba(185, 141, 43, 0.28), transparent 62%),
-    linear-gradient(180deg, #15181c 0%, var(--slate) 60%, #0b0e10 100%);
+    radial-gradient(85% 70% at 50% 122%, rgba(203, 161, 58, 0.26), transparent 62%),
+    linear-gradient(180deg, #14100c 0%, #1a150f 58%, #100d09 100%);
 }
 
 /* Bridges: no more walls between dark and paper. The stops walk through
@@ -139,42 +148,42 @@ body {
   height: 16rem;
   background: linear-gradient(
     180deg,
-    #0e1113 0.0%,
-    #101315 7.1%,
-    #17191a 14.3%,
-    #232423 21.4%,
-    #333330 28.6%,
-    #464541 35.7%,
-    #5e5b56 42.9%,
-    #77746e 50.0%,
-    #928f89 57.1%,
-    #aca9a4 64.3%,
-    #c5c3be 71.4%,
-    #dad8d5 78.6%,
-    #eaeae7 85.7%,
-    #f4f4f2 92.9%,
-    #f8f8f6 100.0%
+    #17130e 0.0%,
+    #1a1610 7.1%,
+    #221d16 14.3%,
+    #302a20 21.4%,
+    #423a2e 28.6%,
+    #574e3f 35.7%,
+    #6d6453 42.9%,
+    #857b69 50.0%,
+    #9c937f 57.1%,
+    #b2a996 64.3%,
+    #c5bcaa 71.4%,
+    #d4cdbc 78.6%,
+    #e0d9c9 85.7%,
+    #e7e0d2 92.9%,
+    #e9e3d5 100.0%
   );
 }
 .bridge-paper-to-dark {
   height: 16rem;
   background: linear-gradient(
     180deg,
-    #f8f8f6 0.0%,
-    #f4f4f2 7.1%,
-    #eaeae7 14.3%,
-    #dad8d5 21.4%,
-    #c5c3be 28.6%,
-    #aca9a4 35.7%,
-    #928f89 42.9%,
-    #77746e 50.0%,
-    #5e5b56 57.1%,
-    #464541 64.3%,
-    #333330 71.4%,
-    #232423 78.6%,
-    #17191a 85.7%,
-    #101315 92.9%,
-    #0e1113 100.0%
+    #e9e3d5 0.0%,
+    #e7e0d2 7.1%,
+    #e0d9c9 14.3%,
+    #d4cdbc 21.4%,
+    #c5bcaa 28.6%,
+    #b2a996 35.7%,
+    #9c937f 42.9%,
+    #857c69 50.0%,
+    #6d6453 57.1%,
+    #574e3f 64.3%,
+    #423a2e 71.4%,
+    #302a20 78.6%,
+    #221d16 85.7%,
+    #1a1610 92.9%,
+    #17130e 100.0%
   );
 }
 

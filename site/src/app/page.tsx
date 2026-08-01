@@ -63,7 +63,7 @@ export default function Home() {
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "linear-gradient(100deg, rgba(14,17,19,.94) 0%, rgba(14,17,19,.82) 34%, rgba(14,17,19,.15) 62%, rgba(14,17,19,0) 100%)",
+              "linear-gradient(100deg, rgba(23,19,14,.94) 0%, rgba(23,19,14,.82) 34%, rgba(23,19,14,.15) 62%, rgba(23,19,14,0) 100%)",
           }}
         />
         <div
@@ -71,7 +71,7 @@ export default function Home() {
           className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
           style={{
             background:
-              "linear-gradient(to top, rgba(14,17,19,.92), rgba(14,17,19,0))",
+              "linear-gradient(to top, rgba(23,19,14,.92), rgba(23,19,14,0))",
           }}
         />
         <div className="pointer-events-none absolute inset-0 flex flex-col justify-end gap-10 p-6 pb-6 sm:p-10">
@@ -79,7 +79,7 @@ export default function Home() {
             <p className="eyebrow mb-5 !text-brass">
               Robinhood Chain · Uniswap Liquidity Launcher
             </p>
-            <h1 className="display text-[clamp(2.6rem,6.4vw,5.4rem)] text-[#f2efe7]">
+            <h1 className="display text-[clamp(2.6rem,6.4vw,5.4rem)] text-[#efe8da]">
               Every launch auction,
               <br />
               read before the
@@ -97,12 +97,12 @@ export default function Home() {
                   style={{ background: l.tone }}
                   className="block h-[13px] w-[3px]"
                 />
-                <span className="data text-[11px] text-[#8f949b]">
-                  <span className="text-[#e2ded4]">{l.n}</span> {l.label}
+                <span className="data text-[11px] text-[#a2937c]">
+                  <span className="text-[#efe8da]">{l.n}</span> {l.label}
                 </span>
               </div>
             ))}
-            <span className="data ml-auto hidden text-[11px] text-[#5f656c] sm:block">
+            <span className="data ml-auto hidden text-[11px] text-[#7d7263] sm:block">
               one bar = one launch · scroll
             </span>
           </div>
@@ -201,10 +201,10 @@ export default function Home() {
       <section className="bg-slate-glow grain px-6 py-24 sm:px-10 sm:py-32">
         <div className="mx-auto max-w-6xl">
           <Reveal>
-            <p className="eyebrow mb-8 !text-[#8f949b]">What gets read</p>
+            <p className="eyebrow mb-8 !text-[#a2937c]">What gets read</p>
           </Reveal>
           <Reveal delay={0.05}>
-            <blockquote className="display max-w-[26ch] text-[clamp(1.7rem,3.4vw,2.6rem)] text-[#f2efe7]">
+            <blockquote className="display max-w-[26ch] text-[clamp(1.7rem,3.4vw,2.6rem)] text-[#efe8da]">
               Uniswap&rsquo;s own documentation calls it{" "}
               <span className="italic text-brass">
                 &ldquo;trivially easy&rdquo;
@@ -214,20 +214,20 @@ export default function Home() {
             </blockquote>
           </Reveal>
           <Reveal delay={0.1}>
-            <p className="mt-6 max-w-[54ch] text-[#9aa0a8]">
+            <p className="mt-6 max-w-[54ch] text-[#a99a84]">
               That is the whole job. These are the fields a verdict is built
               from — all public, all readable before an auction closes.
             </p>
           </Reveal>
 
-          <dl className="mt-16 border-t border-[#2a2e33]">
+          <dl className="mt-16 border-t border-[#33291d]">
             {READS.map(([term, def], i) => (
               <Reveal key={term} delay={i * 0.04}>
-                <div className="grid gap-2 border-b border-[#2a2e33] py-6 md:grid-cols-[16rem_1fr] md:gap-10">
+                <div className="grid gap-2 border-b border-[#33291d] py-6 md:grid-cols-[16rem_1fr] md:gap-10">
                   <dt className="data text-[13px] tracking-[0.05em] text-brass">
                     {term}
                   </dt>
-                  <dd className="text-[15.5px] text-[#9aa0a8]">{def}</dd>
+                  <dd className="text-[15.5px] text-[#a99a84]">{def}</dd>
                 </div>
               </Reveal>
             ))}
@@ -239,11 +239,11 @@ export default function Home() {
       <footer className="bg-slate-glow-deep grain px-6 py-20 sm:px-10">
         <div className="mx-auto max-w-6xl">
           <Reveal>
-            <p className="display max-w-[18ch] text-[clamp(1.8rem,3.6vw,2.8rem)] text-[#f2efe7]">
+            <p className="display max-w-[18ch] text-[clamp(1.8rem,3.6vw,2.8rem)] text-[#efe8da]">
               Read the gavel before you bid.
             </p>
           </Reveal>
-          <div className="mt-14 flex flex-wrap items-center justify-between gap-6 border-t border-[#23272b] pt-8">
+          <div className="mt-14 flex flex-wrap items-center justify-between gap-6 border-t border-[#2b2318] pt-8">
             <div className="flex items-center gap-3">
               <Image
                 src="/brand/gavel-mark-tight.png"
@@ -251,26 +251,26 @@ export default function Home() {
                 width={26}
                 height={26}
               />
-              <span className="data text-[11px] tracking-[0.2em] text-[#8f949b]">
+              <span className="data text-[11px] tracking-[0.2em] text-[#a2937c]">
                 GAVELSCAN
               </span>
             </div>
             <nav className="flex gap-8">
               <a
                 href="https://x.com/gavelscan"
-                className="data text-[12px] text-[#8f949b] transition-colors hover:text-brass"
+                className="data text-[12px] text-[#a2937c] transition-colors hover:text-brass"
               >
                 x.com/gavelscan
               </a>
               <a
                 href="https://github.com/gavelscan/gavel"
-                className="data text-[12px] text-[#8f949b] transition-colors hover:text-brass"
+                className="data text-[12px] text-[#a2937c] transition-colors hover:text-brass"
               >
                 github
               </a>
             </nav>
           </div>
-          <p className="data mt-8 max-w-[62ch] text-[11px] leading-relaxed text-[#5f656c]">
+          <p className="data mt-8 max-w-[62ch] text-[11px] leading-relaxed text-[#7d7263]">
             GAVEL publishes an opinion about risk, not a guarantee of outcome. A
             verdict describes what a launch&rsquo;s parameters say. It is not
             advice about what to do with money.
