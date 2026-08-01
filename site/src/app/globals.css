@@ -106,7 +106,14 @@ body {
 
 /* --- atmosphere ----------------------------------------------------------
    Every gradient stays inside the brand family: slate, brass, paper.
-   Depth comes from light, not from new colours. */
+   Depth comes from light, not from new colours.
+
+   The washes are anchored to the VIEWPORT, not to the element. Sized as a
+   percentage of their box, they stretched with the content — filtering the
+   record from ninety-seven rows down to six visibly changed the colour of
+   the page, which is the kind of thing a reader notices without being able
+   to say why. Anchored to the viewport, the lamp stays where it is however
+   long the page runs. */
 
 /* Parchment under a lamp: light from one corner, a second from the far
    side, and a vignette so the sheet reads as a sheet instead of a fill. */
@@ -116,6 +123,7 @@ body {
     radial-gradient(60% 50% at 8% 82%, rgba(154, 116, 32, 0.1), transparent 70%),
     radial-gradient(85% 60% at 50% 50%, transparent 45%, rgba(70, 58, 38, 0.06) 92%, transparent 100%),
     var(--paper);
+  background-attachment: fixed;
 }
 
 /* The lamp moved to the other side, so consecutive sheets never repeat. */
@@ -125,6 +133,7 @@ body {
     radial-gradient(70% 55% at 88% 80%, rgba(154, 116, 32, 0.09), transparent 70%),
     radial-gradient(90% 65% at 50% 50%, rgba(70, 58, 38, 0.05) 0%, transparent 75%),
     var(--paper);
+  background-attachment: fixed;
 }
 
 /* Instrument dark: slate lit from below by a brass horizon. */
@@ -133,6 +142,7 @@ body {
     radial-gradient(75% 55% at 50% 100%, rgba(203, 161, 58, 0.18), transparent 72%),
     radial-gradient(50% 40% at 86% 8%, rgba(203, 161, 58, 0.08), transparent 70%),
     var(--slate);
+  background-attachment: fixed;
 }
 
 /* Footer continues exactly where the dark section leaves off, so the
@@ -141,6 +151,7 @@ body {
   background:
     radial-gradient(80% 60% at 50% 104%, rgba(203, 161, 58, 0.24), transparent 74%),
     var(--slate);
+  background-attachment: fixed;
 }
 
 /* Bridges: no more walls between dark and paper. The stops walk through
@@ -248,22 +259,27 @@ body {
     opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
-/* Resting: one short stroke held at a writing angle. */
+/* A dot, not a stroke. An angled mark sitting on a word reads as a
+   stray slash — the same failure the brackets had, in a smaller size.
+   A circle cannot be mistaken for a glyph. */
 .nib-stroke {
-  left: 8px;
-  top: 2px;
-  width: 1.5px;
-  height: 14px;
-  transform: rotate(38deg);
-  transform-origin: 50% 100%;
-}
-/* Active: the mark simply brightens and tightens. Nothing is drawn
-   around the target — the target itself lights up. */
-.nib[data-over="true"] .nib-stroke {
-  height: 9px;
-  top: 5px;
+  left: 6px;
+  top: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
   background: var(--brass-bright);
-  box-shadow: 0 0 6px rgba(185, 141, 43, 0.6);
+  transform: none;
+}
+/* Over something interactive it opens into a thin ring, so the pointer
+   stays visible without adding ink on top of the label. */
+.nib[data-over="true"] .nib-stroke {
+  left: 3px;
+  top: 3px;
+  width: 12px;
+  height: 12px;
+  background: transparent;
+  border: 1.5px solid var(--brass-bright);
 }
 
 /* Interactive text announces itself: brass, with a rule drawn under it
@@ -287,6 +303,15 @@ body {
 .navlink:hover::after,
 .navlink[data-active="true"]::after {
   transform: scaleX(1);
+}
+
+@media (hover: none), (max-width: 640px) {
+  .bg-paper-warm,
+  .bg-paper-sunk-warm,
+  .bg-slate-glow,
+  .bg-slate-glow-deep {
+    background-attachment: scroll;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

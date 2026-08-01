@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CEILING_TONE, FEED, ROWS, pct, safeSymbol, shortAddr } from "@/lib/feed";
+import {
+  CEILING_TONE,
+  FEED,
+  ROWS,
+  actionLink,
+  pct,
+  safeSymbol,
+  shortAddr,
+} from "@/lib/feed";
 
 export const metadata: Metadata = {
   title: "Live auctions — GAVEL",
@@ -96,6 +104,17 @@ export default function Live() {
                     </p>
                   )}
                 </Link>
+                {actionLink(r) && (
+                  <a
+                    href={actionLink(r)!.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="data mx-6 mb-6 inline-block text-[11px] tracking-[0.12em] transition-colors hover:text-brass"
+                    style={{ color: "var(--brass)" }}
+                  >
+                    OPEN AUCTION ON UNISWAP ↗
+                  </a>
+                )}
               </li>
             ))}
           </ul>

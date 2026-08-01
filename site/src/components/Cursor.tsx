@@ -3,8 +3,8 @@
 /**
  * A reader marking a record.
  *
- * The pointer becomes a fine brass nib that draws a short ink stroke as it
- * moves and dries out behind it — the same trailing-canvas technique used
+ * The pointer becomes a small brass dot that draws a short ink stroke as
+ * it moves and dries out behind it — the same trailing-canvas technique used
  * for the streaks on HATCH, turned into annotation. Over anything
  * interactive the nib opens into a bracket, the mark an editor puts around
  * the thing they are pointing at.
@@ -131,8 +131,9 @@ export default function Cursor() {
         aria-hidden
         className="nib pointer-events-none fixed left-0 top-0 z-[91] hidden h-[18px] w-[18px] [.has-nib_&]:block [.nib-off_&]:hidden"
       >
-        {/* One mark, held at a writing angle. It brightens over anything
-            interactive; the element itself does the announcing. */}
+        {/* A dot, which cannot be misread as a character the way an
+            angled stroke on a word can. It opens into a ring over
+            anything interactive; the element itself does the announcing. */}
         <span className="nib-stroke" />
       </div>
     </>

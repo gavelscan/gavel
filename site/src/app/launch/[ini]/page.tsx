@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import Copyable from "@/components/Copyable";
 import {
   CEILING_TONE,
   ROWS,
+  actionLink,
   STATE_LABEL,
   STATE_TONE,
   pct,
@@ -49,21 +51,30 @@ export default async function LaunchPage({
   const row = find(ini);
   if (!row) notFound();
 
-  const facts: [string, string][] = [
-    ["token", `${safeSymbol(row.sym)} · ${shortAddr(row.token)}`],
+  const action = actionLink(row);
+
+  const facts: [string, React.ReactNode][] = [
+    [
+      "token",
+      <>
+        {safeSymbol(row.sym)} ·{" "}
+        <Copyable value={row.token} label={shortAddr(row.token)} />
+      </>,
+    ],
     [
       "priced in",
       `${safeSymbol(row.cur_sym)}${row.cur_official ? " · official stock token" : ""}`,
     ],
     [
       "recipient",
-      `${shortAddr(row.recipient)} · ${
-        row.rec_code > 0
+      <>
+        <Copyable value={row.recipient} label={shortAddr(row.recipient)} /> ·{" "}
+        {row.rec_code > 0
           ? "contract"
           : row.rec_nonce === 0
             ? "fresh EOA, no history"
-            : `EOA, ${row.rec_nonce} prior transactions`
-      }`,
+            : `EOA, ${row.rec_nonce} prior transactions`}
+      </>,
     ],
     ["LP reserve", `${pct(row.lp_ratio)} of supply`],
     [
@@ -116,6 +127,18 @@ export default async function LaunchPage({
             </span>
           </div>
         </div>
+
+        {action && (
+          <a
+            href={action.href}
+            target="_blank"
+            rel="noreferrer"
+            className="data mt-10 inline-flex items-center gap-2 border px-5 py-2.5 text-[12px] tracking-[0.12em] transition-colors"
+            style={{ borderColor: "var(--brass)", color: "var(--brass)" }}
+          >
+            {action.label.toUpperCase()} ↗
+          </a>
+        )}
 
         <dl className="mt-16 border-t border-hairline">
           {facts.map(([k, v]) => (

@@ -9,6 +9,7 @@
  */
 
 import Link from "next/link";
+import Copyable from "@/components/Copyable";
 import { useMemo, useState } from "react";
 import {
   CEILING_TONE,
@@ -141,7 +142,7 @@ export default function LaunchTable({ rows }: { rows: LaunchRow[] }) {
                     {safeSymbol(r.sym)}
                   </Link>
                   <div className="data mt-0.5 text-[11px] text-ink-soft">
-                    {shortAddr(r.token)}
+                    <Copyable value={r.token} label={shortAddr(r.token)} />
                   </div>
                 </td>
                 <td className="py-3.5 pr-4">
@@ -213,7 +214,7 @@ export default function LaunchTable({ rows }: { rows: LaunchRow[] }) {
                     {safeSymbol(r.sym)}
                   </span>
                   <span className="data mt-1 block text-[11px] text-ink-soft">
-                    {shortAddr(r.token)}
+                    <Copyable value={r.token} label={shortAddr(r.token)} />
                   </span>
                 </div>
                 <span
