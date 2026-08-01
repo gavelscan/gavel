@@ -56,14 +56,15 @@ a feature, not a weakness.
   deliberately not load-bearing on its own: the structural defenses (no
   free text, fact-bounded assessments, clamp) are what make a missed
   signal survivable.
-- **Model calibration.** The classification enums (currency/hook/recipient
-  assessment) are the model's judgment and can be miscalibrated — e.g. a
-  weaker model labelling a genuine stock token "likely_impostor" when it
-  lacks provenance data. The verdict itself is bounded by the
-  deterministic ceiling, so a miscalibrated label cannot upgrade risk into
-  a PASS; but the label shown on the card can still mislead. Mitigation
-  (future): feed the judge the RHJ stock-token registry so currency
-  authenticity is grounded, not guessed.
+- **Currency authenticity is now grounded, not guessed.** The official
+  RHJ stock-token registry (chain 4663, cached in gavel/rhj_registry.json)
+  makes "official stock token" a fact of registered address, not a name
+  pattern: a currency in the registry is fixed to verified_official, a
+  name that claims the official pattern from an unregistered address is
+  fixed to likely_impostor, and neither can be moved by the model. Residual
+  risk: the cached registry can go stale between refreshes, so a token
+  registered after the last fetch reads as unknown rather than official —
+  fail-open toward caution, never toward a false verified badge.
 - **Judgment error.** The judge will sometimes read a hook wrong.
   Mitigation: verdicts carry reasoning + evidence links so readers can
   disagree; FLAG exists precisely so uncertainty is never rounded up to

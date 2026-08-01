@@ -17,8 +17,8 @@ sentence, implemented.
 | 2 | Chain client — raw JSON-RPC, no indexer trust | `gavel/chain.py` | ✅ done |
 | 3 | Deterministic checks + verdict ceiling | `gavel/checks.py` | ✅ done |
 | 4 | Watcher — poll loop over new launches | `gavel/watch.py` | ✅ done, full history archived |
-| 5 | Judge — agent layer (see Agent spec) | `agent/` | ✅ done, twice-reviewed, 155 tests |
-| 6 | Verdict card renderer + X posting | `card/` | ⬜ |
+| 5 | Judge — agent layer (see Agent spec) | `agent/` | ✅ done, twice-reviewed |
+| 6 | Verdict card renderer + X posting | `card/` | 🟡 card done, posting next |
 | 7 | Static feed site (gavelscan.xyz) | `site/` | ⬜ last |
 
 No smart contracts in v0. No token. No wallet-connect. On-chain
@@ -72,9 +72,12 @@ assessment is reconciled against the facts (`derive_assessments`):
 fact-determined fields are *replaced* by the fact (recipient code/nonce
 decides contract vs fresh vs established EOA; a zero hook is "none";
 native ETH is "native_eth"), and genuinely judgmental fields are coerced
-into an allowed set (a nonzero hook can never be "none"). `verified_official`
-is not selectable at all until an issuer registry is wired — an
-unverifiable claim must never publish as verification. Any model answer
+into an allowed set (a nonzero hook can never be "none"). Currency
+authenticity is settled by the cached official RHJ stock-token registry:
+a registered address is fixed to `verified_official`, a name claiming the
+official pattern from an unregistered address is fixed to
+`likely_impostor`, and an unverifiable claim can never publish as
+verification. Any model answer
 contradicting the facts is recorded as a disagreement and itself raises
 the manipulation flag.
 Two more defenses back it: a per-call nonce fence around the evidence
@@ -119,7 +122,7 @@ Deterministic factsheets can still be generated headless.
 
 ## Test plan
 
-Target bar: 107+ tests before the feed goes public. Current: 155.
+Target bar: 107+ tests before the feed goes public. Current: 167.
 
 - Unit: decoder edge cases, schedule/position/pool/recipient checks — ✅ started
 - Fixture: real HOTDOG/COST launch receipt (block 23898781) — ✅
@@ -143,7 +146,8 @@ written in the concept doc and are binding.
 - [x] Watcher loop + launch archive (JSONL) — 2,214 events, full LL history on RHC
 - [x] Judge runtime + policy gates + adversarial tests (107 tests total)
 - [x] Model provider adapter (Anthropic + OpenAI-compatible/GLM), env-selected
-- [ ] Verdict card renderer (brand: slate/brass, PASS/FLAG/FAIL stamp)
+- [x] Verdict card renderer (brand: slate/brass, PASS/FLAG/FAIL stamp)
+- [x] RHJ stock-token registry wired — currency authenticity is a fact
 - [ ] X posting via @gavelscan (dry-run first, then armed)
 - [ ] Static feed on gavelscan.xyz
 - [ ] Public repo under github.com/gavelscan (English-only), CI green

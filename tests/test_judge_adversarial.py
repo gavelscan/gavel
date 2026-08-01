@@ -377,12 +377,32 @@ class TestAssessmentReconciliation(unittest.TestCase):
         self.assertEqual(len(out["assessment_disagreements"]), 3)
         self.assertTrue(out["manipulation_detected"])
 
-    def test_verified_official_not_selectable_without_registry(self):
-        # An unverifiable claim must never publish as verification.
-        fs = factsheet(ceiling=FLAG, currency_name="Costco Robinhood Token")
+    def test_verified_official_not_selectable_for_plausible_currency(self):
+        # A non-official, non-impostor currency can never be upgraded to
+        # verified_official by the model — the label requires a registry hit.
+        fs = factsheet(ceiling=FLAG, currency_name="Some Wrapped Token")
         out = judge_factsheet(fs, model=model_returning(
             {**GOOD, "verdict": FLAG, "currency_assessment": "verified_official"}))
-        self.assertEqual(out["currency_assessment"], "unknown")
+        self.assertNotEqual(out["currency_assessment"], "verified_official")
+
+    def test_registry_claim_without_backing_is_fixed_impostor(self):
+        # Claims the official name, not in the registry (official flag off):
+        # a fixed impostor call, and the model cannot soften it.
+        fs = factsheet(ceiling=FAIL, currency_name="Costco Robinhood Token")
+        out = judge_factsheet(fs, model=model_returning(
+            {**GOOD, "verdict": FAIL, "currency_assessment": "plausible"}))
+        self.assertEqual(out["currency_assessment"], "likely_impostor")
+
+    def test_official_registry_currency_fixed_verified(self):
+        # official flag set (address in the RHJ registry): verified_official
+        # is a fact, and a hostile model saying "impostor" cannot lower it.
+        fs = factsheet(ceiling=PASS)
+        fs["currency"] = {"kind": "erc20", "official": True,
+                          "name": "Costco • Robinhood Token", "symbol": "COST",
+                          "findings": []}
+        out = judge_factsheet(fs, model=model_returning(
+            {**GOOD, "currency_assessment": "likely_impostor"}))
+        self.assertEqual(out["currency_assessment"], "verified_official")
 
     def test_native_eth_currency_fixed_by_facts(self):
         fs = factsheet(ceiling=PASS)

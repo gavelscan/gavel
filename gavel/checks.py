@@ -10,6 +10,8 @@ language model having a good day.
 Verdict ordering: PASS > FLAG > FAIL.
 """
 
+import json
+import os
 from typing import Optional
 
 from .chain import Rpc
@@ -25,6 +27,23 @@ from .constants import (
 
 PASS, FLAG, FAIL = "PASS", "FLAG", "FAIL"
 _ORDER = {PASS: 2, FLAG: 1, FAIL: 0}
+
+# Official RHJ stock-token registry (chain 4663), cached from
+# api.robinhood.com/rhj/assets. Membership makes "official stock token" a
+# FACT rather than a name-pattern guess — an impostor can copy the name
+# "Costco • Robinhood Token" but cannot land on the real address.
+_REGISTRY_PATH = os.path.join(os.path.dirname(__file__), "rhj_registry.json")
+
+
+def _load_registry() -> dict:
+    try:
+        with open(_REGISTRY_PATH) as f:
+            return {k.lower(): v for k, v in json.load(f).items()}
+    except (OSError, ValueError):
+        return {}
+
+
+RHJ_REGISTRY = _load_registry()
 
 
 def worse(a: str, b: str) -> str:
@@ -130,26 +149,39 @@ def check_currency(rpc: Rpc, currency: str) -> dict:
     """Facts about the auction currency. Judgment about authenticity
     (real RHJ stock token vs impostor) belongs to the judge, not here."""
     if currency == ZERO_ADDRESS:
-        return {"kind": "native_eth", "findings": []}
+        return {"kind": "native_eth", "official": False, "findings": []}
+    official = RHJ_REGISTRY.get(currency.lower())
     facts = {
         "kind": "erc20",
         "symbol": rpc.read_string(currency, Rpc.SEL_SYMBOL),
         "name": rpc.read_string(currency, Rpc.SEL_NAME),
         "code_size": rpc.get_code_size(currency),
+        "official": official is not None,
+        "official_symbol": official["symbol"] if official else None,
         "findings": [],
     }
     if facts["code_size"] == 0:
         facts["findings"].append(("currency_no_code", FAIL, "currency has no bytecode"))
+
     name = facts["name"] or ""
-    if name.endswith("Robinhood Token"):
+    if official:
+        # Address is in the official registry: authenticity is a fact.
         facts["findings"].append((
-            "currency_claims_rhj", FLAG,
-            "name pattern claims official Robinhood stock token — authenticity requires judgment",
+            "currency_official_stock", PASS,
+            "auction currency is an official Robinhood stock token (%s), verified by registered address"
+            % official["symbol"],
+        ))
+    elif name.endswith("Robinhood Token"):
+        # Claims the name but the address is NOT registered — the exact
+        # impostor shape.
+        facts["findings"].append((
+            "currency_impostor_claim", FAIL,
+            "currency name claims an official Robinhood stock token, but its address is not in the registry",
         ))
     else:
         facts["findings"].append((
             "currency_nonstandard", FLAG,
-            "auction priced in arbitrary ERC20 %r — value of raise depends on it" % (facts["symbol"],),
+            "auction priced in arbitrary ERC20 %r — value of the raise depends on it" % (facts["symbol"],),
         ))
     return facts
 
@@ -187,12 +219,17 @@ def derive_assessments(factsheet: dict) -> dict:
     else:
         hook_rule = {"allowed": ("benign", "suspicious", "hostile", "unknown")}
 
-    # Currency: native ETH is a fact. For an ERC20, "verified_official"
-    # requires membership in a trusted issuer registry we control. No
-    # registry is wired yet, so that label is not selectable — an
-    # unverifiable claim must never be published as verification.
+    # Currency: native ETH and registry membership are facts. An address
+    # in the official RHJ registry is verified; a name that claims the
+    # official pattern from an unregistered address is a fixed impostor
+    # call, not a matter of opinion. Everything else stays judgmental.
+    name = (currency.get("name") or "")
     if currency.get("kind") == "native_eth":
         currency_rule = {"fixed": "native_eth"}
+    elif currency.get("official"):
+        currency_rule = {"fixed": "verified_official"}
+    elif name.endswith("Robinhood Token"):
+        currency_rule = {"fixed": "likely_impostor"}
     else:
         currency_rule = {"allowed": ("plausible", "unverified",
                                      "likely_impostor", "unknown")}
