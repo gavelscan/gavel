@@ -3,7 +3,7 @@ import LaunchField from "@/components/LaunchField";
 import Reveal from "@/components/Reveal";
 import launches from "./launches.json";
 
-type Row = { s: "pool" | "failed" | "live" | "silent"; c: number };
+type Row = { s: "pool" | "failed" | "live" | "unfilled"; c: number };
 const DATA = launches as Row[];
 const count = (s: Row["s"]) => DATA.filter((d) => d.s === s).length;
 
@@ -11,11 +11,11 @@ const TOTAL = DATA.length;
 const POOL = count("pool");
 const FAILED = count("failed");
 const LIVE = count("live");
-const SILENT = count("silent");
+const UNFILLED = count("unfilled");
 const TOKEN_PAIRED = DATA.filter((d) => d.c === 1).length;
 
 const LEGEND = [
-  { key: "silent", label: "never migrated", n: SILENT, tone: "#6e737a" },
+  { key: "unfilled", label: "drew no bids", n: UNFILLED, tone: "#6e737a" },
   { key: "pool", label: "became a pool", n: POOL, tone: "var(--brass)" },
   { key: "failed", label: "migration failed", n: FAILED, tone: "var(--fail)" },
   { key: "live", label: "still in auction", n: LIVE, tone: "#e8e4da" },
@@ -125,21 +125,22 @@ export default function Home() {
           </Reveal>
           <Reveal delay={0.1}>
             <p className="mt-8 max-w-[58ch] text-ink-soft">
-              Migration is permissionless: once the migration block passes,
-              anyone can turn a finished auction into a live pool. For most
-              launches here, nobody ever made that call. Another {FAILED}{" "}
-              reached migration and failed, which returns the raised currency
-              and the reserved LP tokens to an address the deployer chose in
-              advance.
+              The gap is not neglect. Reading each auction directly shows
+              that {UNFILLED} of them never reached a clearing price at all —
+              nobody bid enough for there to be anything to migrate. Every
+              auction that did clear was migrated; not one was left sitting.
+              A further {FAILED} reached migration and failed, which returns
+              the raised currency and the reserved LP tokens to an address
+              the deployer chose in advance.
             </p>
           </Reveal>
 
           <div className="mt-16 grid gap-px border border-hairline bg-hairline sm:grid-cols-4">
             {[
-              ["Archived events", "2,214"],
+              ["Archived events", "2,550"],
               ["Launch auctions", String(TOTAL)],
               ["Token-paired", String(TOKEN_PAIRED)],
-              ["Migration failures", String(FAILED)],
+              ["Drew no bids", String(UNFILLED)],
             ].map(([label, value], i) => (
               <Reveal key={label} delay={i * 0.06} className="bg-paper">
                 <div className="p-6">

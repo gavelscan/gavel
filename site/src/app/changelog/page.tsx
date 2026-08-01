@@ -20,6 +20,12 @@ const ENTRIES: Entry[] = [
   {
     date: "2026-08-01",
     kind: "correction",
+    head: "The record blamed neglect for something nobody was neglecting",
+    body: "This site said that most auctions never became pools because nobody made the permissionless call to migrate them. That was an inference, and it was wrong. The chain emits no event for an auction that draws no bids — it simply sits past its migration block, which looks identical to one that cleared and was left alone. Reading each initializer directly settles it: they revert until a clearing price exists. Of 510 auctions, 384 never cleared at all, and every single auction that did clear was migrated. Not one was left sitting. The record now names the two states separately, because they are two different stories about the same silence.",
+  },
+  {
+    date: "2026-08-01",
+    kind: "correction",
     head: "The verdict said FLAG about almost everything, which is the same as saying nothing",
     body: "Under the first calibration 87% of the record sat below PASS, and the reason was a single check: paying an ordinary wallet was treated as a warning, when 85% of launches do exactly that. A signal that fires on five launches in six is not a signal. Findings now carry an INFO severity that is published but moves nothing, warnings are reserved for what is actually unusual — a recipient wallet with almost no history, a raise that routes less than half of itself to liquidity — and FAIL for what is structural, like a schedule that sends the money past liquidity entirely. Measured across the whole record of 462 launches the split is now 380 PASS, 72 FLAG and 10 FAIL. A verdict layer should be quiet like a smoke alarm, not loud like a car alarm.",
   },

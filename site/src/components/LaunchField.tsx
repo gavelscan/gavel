@@ -3,7 +3,7 @@
 /**
  * The signature element.
  *
- * 462 bars, one per launch auction actually recorded on Robinhood Chain by
+ * One bar per launch auction actually recorded on Robinhood Chain by
  * the GAVEL watcher. Height and colour come from what happened to that
  * launch, not from taste. The camera starts down inside the field, where it
  * looks like a crowd, and scroll lifts it out until the grid resolves and you
@@ -17,7 +17,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import launches from "@/app/launches.json";
 
-type Row = { b: number; s: "pool" | "failed" | "live" | "silent"; c: number; lp: number };
+type Row = { b: number; s: "pool" | "failed" | "live" | "unfilled"; c: number; lp: number };
 
 const DATA = launches as Row[];
 
@@ -27,17 +27,17 @@ const BAR_W = 0.44;
 
 /* Every bar is a launch, so every bar stands at a comparable height —
    letting the successful ones tower would misrepresent the record by making
-   97 read as the majority. Colour carries the outcome; the grey crowd is
+   the migrated minority read as the majority. Colour carries the outcome; the grey crowd is
    supposed to dominate, because it does. */
 const TONE: Record<Row["s"], string> = {
-  silent: "#4a443a", // never became a pool — the bulk
+  unfilled: "#4a443a", // drew no bids at all — the bulk
   pool: "#b98d2b", // brass: migrated, liquidity exists
   failed: "#b3372f",
   live: "#efe8da", // still inside its auction window
 };
 
 const HEIGHT: Record<Row["s"], number> = {
-  silent: 1.5,
+  unfilled: 1.5,
   pool: 2.1,
   failed: 1.7,
   live: 1.8,
