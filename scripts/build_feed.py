@@ -18,11 +18,13 @@ import time
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from gavel.chain import Rpc, RpcError  # noqa: E402
-from gavel.checks import build_factsheet  # noqa: E402
+from gavel.lock import Locked, exclusive  # noqa: E402
+from gavel.checks import CHECKS_VERSION, build_factsheet  # noqa: E402
 from gavel.constants import ZERO_ADDRESS  # noqa: E402
 
 ARCHIVE = "data/events.jsonl"
 CACHE = "data/feed-cache.json"
+LOCK = "data/.feed-cache.lock"
 OUT = "data/feed.json"
 
 
@@ -84,7 +86,7 @@ def main():
         else:
             state = "silent"  # refined below once the auction is read
 
-        if ini in cache:
+        if ini in cache and cache[ini].get("v") == CHECKS_VERSION:
             row = cache[ini]
             row["state"] = state  # state can change over time
             if "cleared" not in row:
@@ -102,8 +104,10 @@ def main():
                 row["state"] = "unfilled"
         else:
             try:
-                sheet = build_factsheet(rpc, launch, current_block=head)
                 outcome = rpc.auction_outcome(launch["initializer"])
+                launch["sold"] = outcome["sold"]
+                launch["migrated"] = ini in migrated
+                sheet = build_factsheet(rpc, launch, current_block=head)
                 token_symbol = rpc.read_string(p["token"], Rpc.SEL_SYMBOL)
                 currency_symbol = (
                     "ETH" if p["currency"] == ZERO_ADDRESS
@@ -134,6 +138,7 @@ def main():
                     ],
                     "state": ("unfilled" if state == "silent"
                               and not outcome["cleared"] else state),
+                    "v": CHECKS_VERSION,
                 }
                 cache[ini] = row
                 if i % 10 == 0:
@@ -159,8 +164,10 @@ def main():
             ini = launch["initializer"].lower()
             p2 = launch["params"]
             try:
-                sheet = build_factsheet(rpc, launch, current_block=head)
                 outcome = rpc.auction_outcome(launch["initializer"])
+                launch["sold"] = outcome["sold"]
+                launch["migrated"] = ini in migrated
+                sheet = build_factsheet(rpc, launch, current_block=head)
             except RpcError:
                 still_absent.append(ini)
                 continue
@@ -185,6 +192,7 @@ def main():
                              for k, sv, d in sheet["findings"]],
                 "state": ("unfilled" if base == "silent"
                           and not outcome["cleared"] else base),
+                "v": CHECKS_VERSION,
             }
             rows.append(cache[ini])
 
@@ -203,4 +211,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # Held for the whole build: the cache is written at the end, but it is
+    # read at the start, so overlapping runs corrupt each other even when
+    # only one of them writes.
+    try:
+        with exclusive(LOCK, "the feed cache"):
+            main()
+    except Locked as e:
+        sys.exit("build_feed: %s" % e)

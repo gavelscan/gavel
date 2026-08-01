@@ -53,6 +53,21 @@ def main():
         with open(os.path.join(OUT, name), "w") as f:
             json.dump(obj, f, separators=(",", ":"))
 
+    # A tiny endpoint the site's own homepage consumes, so the counters
+    # move when the record does instead of freezing until a redeploy.
+    counts = {}
+    for r in rows:
+        counts[r["state"]] = counts.get(r["state"], 0) + 1
+    events = sum(1 for line in open("data/events.jsonl") if line.strip())
+    dump("summary.json", {
+        "head": head,
+        "archived_events": events,
+        "launches": len(rows),
+        "token_paired": sum(1 for r in rows
+                            if r["currency"] != "0x" + "0" * 40),
+        "by_state": counts,
+    })
+
     live = [public(r) for r in rows if r["state"] == "live"]
     dump("live.json", {"head": head, "count": len(live), "launches": live})
     dump("launches.json", {"head": head, "count": len(rows),

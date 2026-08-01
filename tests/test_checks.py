@@ -188,6 +188,62 @@ class TestRecipientChecks(unittest.TestCase):
         self.assertEqual(findings[0][0], "recipient_eoa")
         self.assertEqual(findings[0][1], INFO)
 
+    def test_delegated_wallet_is_not_a_contract(self):
+        """EIP-7702: 23 bytes of 0xef0100||address is a wallet, not a
+        contract. 39 of the 40 code-bearing recipients in the record are
+        this shape; calling them contracts published a false statement on
+        75 launches."""
+        facts = {"address": "0x1", "code_size": 23, "delegated": True,
+                 "delegate": "0x" + "ab" * 20, "nonce": 7, "balance_wei": 0}
+        findings = check_recipient(facts)
+        self.assertEqual(findings[0][0], "recipient_delegated_wallet")
+        self.assertEqual(findings[0][1], INFO)
+
+    def test_delegated_wallet_never_claims_history(self):
+        """A delegate spends the account's nonce too, so 'never sent a
+        transaction' is not a claim we can make about a delegated wallet
+        — even at nonce 0 it must not FLAG as fresh."""
+        facts = {"address": "0x1", "code_size": 23, "delegated": True,
+                 "delegate": "0x" + "ab" * 20, "nonce": 0, "balance_wei": 0}
+        findings = check_recipient(facts)
+        self.assertEqual(findings[0][0], "recipient_delegated_wallet")
+        self.assertEqual(findings[0][1], INFO)
+
+    def test_real_contract_still_reported(self):
+        """The one genuine contract recipient in the record must keep its
+        label — the delegation carve-out must not swallow it."""
+        facts = {"address": "0x1", "code_size": 45, "delegated": False,
+                 "delegate": None, "nonce": 1, "balance_wei": 0}
+        findings = check_recipient(facts)
+        self.assertEqual(findings[0][0], "recipient_contract")
+
+
+class TestDelegatedAssessment(unittest.TestCase):
+    """derive_assessments hard-fixes the recipient label, so the judge can
+    never correct a mistake made here. The delegation test must win."""
+
+    def _sheet(self, recipient):
+        return {
+            "launch": {"params": {"pool": {"hook": ZERO_ADDRESS},
+                                  "currency": ZERO_ADDRESS}},
+            "recipient": recipient,
+            "currency": {"kind": "native_eth", "official": False,
+                         "registry_status": "unknown"},
+        }
+
+    def test_delegated_wallet_fixed_as_delegated(self):
+        from gavel.checks import derive_assessments
+        rules = derive_assessments(self._sheet(
+            {"code_size": 23, "delegated": True, "nonce": 5}))
+        self.assertEqual(rules["recipient_assessment"],
+                         {"fixed": "delegated_wallet"})
+
+    def test_true_contract_fixed_as_contract(self):
+        from gavel.checks import derive_assessments
+        rules = derive_assessments(self._sheet(
+            {"code_size": 45, "delegated": False, "nonce": 5}))
+        self.assertEqual(rules["recipient_assessment"], {"fixed": "contract"})
+
 
 class TestInfoNeverMovesTheCeiling(unittest.TestCase):
     """The whole point of INFO: it is published, and it changes nothing.

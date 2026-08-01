@@ -48,6 +48,7 @@ ASSESSMENT_LABEL = {
     "unverified": "unverified",
     "likely_impostor": "likely impostor",
     "contract": "contract",
+    "delegated_wallet": "wallet (EIP-7702)",
     "established_eoa": "EOA with history",
     "fresh_eoa": "fresh EOA",
 }

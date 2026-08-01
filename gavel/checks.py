@@ -140,9 +140,19 @@ def check_pool(pool: dict) -> list:
 # -- networked facts ----------------------------------------------------------
 
 def gather_address_facts(rpc: Rpc, address: str) -> dict:
+    code = rpc.call("eth_getCode", [address, "latest"])
     return {
         "address": address,
-        "code_size": rpc.get_code_size(address),
+        "code_size": max(0, len(code) // 2 - 1),
+        # EIP-7702: an account whose code is exactly the 23-byte indicator
+        # 0xef0100 || <20-byte implementation> is not a contract. It is an
+        # ordinary wallet that has delegated execution, and its owner still
+        # holds the key. Treating it as a contract was reporting "raised
+        # funds are routed to a contract" on 75 launches whose recipient is
+        # a person's wallet — 39 of the 40 code-bearing recipients in the
+        # record are these.
+        "delegated": code[:8].lower() == "0xef0100" and len(code) == 48,
+        "delegate": "0x" + code[8:48] if len(code) == 48 else None,
         "nonce": rpc.get_nonce(address),
         "balance_wei": rpc.get_balance(address),
     }
@@ -152,10 +162,18 @@ def check_recipient(facts: dict) -> list:
     """Paying an ordinary EOA is what 85% of launches do; saying so is
     context, not a warning. A recipient with almost no history is the
     unusual shape, and that is what gets flagged."""
-    if facts["code_size"] > 0:
+    if facts["code_size"] > 0 and not facts.get("delegated"):
         return [("recipient_contract", INFO,
                  "raised funds are routed to a contract")]
     nonce = facts["nonce"]
+    if facts.get("delegated"):
+        # Still a wallet, so the history checks below would apply — but a
+        # delegated account's nonce is spent by its delegate as well as by
+        # its owner, so "no history" no longer means what it means for a
+        # plain EOA. Report the fact and claim nothing about the history.
+        return [("recipient_delegated_wallet", INFO,
+                 "raised funds are routed to a wallet running delegated "
+                 "code (EIP-7702)")]
     if nonce == 0:
         return [("recipient_fresh", FLAG,
                  "recipient wallet has never sent a transaction")]
@@ -221,6 +239,38 @@ def check_currency(rpc: Rpc, currency: str) -> dict:
 
 # -- assembly -----------------------------------------------------------------
 
+# check_overhang lived here and has been withdrawn. Keeping the reason,
+# because the mistake is easy to make again:
+#
+# It computed how much of a token the deployer could sell into the pool as
+#     unsold = totalSupply - reservedTokenAmountForLP - sold
+#     depths = unsold / reservedTokenAmountForLP
+# and every term in that is the wrong quantity.
+#
+#  - The numerator counts supply that was never in the auction. The LBP is
+#    endowed with distribution.amount, an arbitrary figure chosen by the
+#    caller; it has no relation to the ERC20's totalSupply. The leftover
+#    the check wanted is initializer.totalSupply() - sold.
+#  - The denominator is not the pool's token balance. Part of the reserve
+#    is swept back out during migration, so the pool receives
+#    reservedTokenAmountForLP - TokensSwept.amount.
+#  - The holder is not "the deployer". Unsold auction tokens stay in the
+#    initializer and are claimed by tokensRecipient(), a separate
+#    parameter, and MigratorParameters.recipient differs from the launch
+#    tx sender on 11 of 105 migrations (one of them is 0x...dead).
+#
+# The measurement that settles it: across all 105 migrations,
+# max(TokensSwept / reservedTokenAmountForLP) = 0.999816 and not one
+# reaches 1.0. The FLAG band began at 1.0 and the FAIL band at 10.0, so
+# both alarms described a state that cannot occur on this chain — yet they
+# fired on 422 launches, and were the sole cause of 14 of the 17 FAILs.
+#
+# Rebuilding it correctly means joining TokensSwept per migration tx,
+# reading tokensRecipient(), and recalibrating against the real
+# distribution. That is a new check, not a patched threshold, and it does
+# not get published until it can be verified the way this one was not.
+
+
 def derive_assessments(factsheet: dict) -> dict:
     """Fact-determined values and allowed sets for the judge's assessments.
 
@@ -237,8 +287,13 @@ def derive_assessments(factsheet: dict) -> dict:
     recipient = factsheet["recipient"]
     currency = factsheet["currency"]
 
-    # Recipient: fully determined by code size and history.
-    if recipient["code_size"] > 0:
+    # Recipient: fully determined by code size and history. The delegation
+    # test comes first — an EIP-7702 account has code but is a wallet, and
+    # because this value is hard-fixed the judge cannot correct it, so a
+    # mislabel here is final.
+    if recipient.get("delegated"):
+        recipient_rule = {"fixed": "delegated_wallet"}
+    elif recipient["code_size"] > 0:
         recipient_rule = {"fixed": "contract"}
     elif recipient["nonce"] == 0:
         recipient_rule = {"fixed": "fresh_eoa"}
@@ -275,6 +330,13 @@ def derive_assessments(factsheet: dict) -> dict:
     }
 
 
+# Bumped whenever the check set changes in a way that would alter an
+# existing row's findings or ceiling. Cached rows carry this stamp; a
+# mismatch forces re-derivation, so the record is never a mixture of
+# launches judged under different rules.
+CHECKS_VERSION = 4
+
+
 def build_factsheet(rpc: Rpc, launch: dict, current_block: Optional[int] = None) -> dict:
     """All deterministic facts for one InitializerCreated launch record."""
     p = launch["params"]
@@ -307,6 +369,7 @@ def build_factsheet(rpc: Rpc, launch: dict, current_block: Optional[int] = None)
                 "lp_reserve_thin", FLAG,
                 "only %.1f%% of supply is reserved for liquidity" % (reserved_ratio * 100),
             ))
+
 
     ceiling = PASS
     for _, severity, _ in findings:

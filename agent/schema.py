@@ -29,7 +29,8 @@ CURRENCY_ASSESSMENTS = (
     "native_eth", "verified_official", "plausible",
     "unverified", "likely_impostor", "unknown",
 )
-RECIPIENT_ASSESSMENTS = ("contract", "established_eoa", "fresh_eoa", "unknown")
+RECIPIENT_ASSESSMENTS = ("contract", "delegated_wallet", "established_eoa",
+                         "fresh_eoa", "unknown")
 
 MAX_KEY_FINDINGS = 8
 
