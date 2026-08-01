@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+:root {
+  /* Paper stock, not cream. This is a record, not a mood board. */
+  --paper: #f8f8f6;
+  --paper-sunk: #f1f0ec;
+  --ink: #14161a;
+  --ink-soft: #5f636a;
+  --hairline: #e0ddd3;
+
+  /* Locked brand */
+  --slate: #0e1113;
+  --brass: #b98d2b;
+  --brass-soft: #d8c9a0;
+
+  /* Verdict states — the only other colours permitted anywhere */
+  --pass: #2e7d4f;
+  --flag: #8a8f98;
+  --fail: #b3372f;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-sunk: var(--paper-sunk);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-hairline: var(--hairline);
+  --color-slate: var(--slate);
+  --color-brass: var(--brass);
+  --color-brass-soft: var(--brass-soft);
+  --color-pass: var(--pass);
+  --color-flag: var(--flag);
+  --color-fail: var(--fail);
+  --font-display: var(--font-newsreader);
+  --font-body: var(--font-instrument);
+  --font-data: var(--font-mono);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-instrument), system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.62;
+}
+
+::selection {
+  background: var(--brass);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
+
+/* --- typographic roles --------------------------------------------------- */
+
+.display {
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.03;
+}
+
+.data {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Eyebrows carry a real coordinate — never decoration. */
+.eyebrow {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* Clause marks sit in the gutter like numbered sections of a statute.
+   Used only where the content genuinely is an ordered procedure. */
+.clause {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--brass);
+}
+
+.hair {
+  border: 0;
+  height: 1px;
+  background: var(--hairline);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

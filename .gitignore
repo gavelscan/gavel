@@ -5,3 +5,5 @@ data/
 *.session
 notes-id/
 brand/size-problem.html
+site-data-launches.json
+.DS_Store
