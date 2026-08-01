@@ -136,27 +136,45 @@ body {
 /* Bridges: no more walls between dark and paper. The stops walk through
    a warm grey so the crossfade reads as light falling off, not a stripe. */
 .bridge-dark-to-paper {
-  height: 9rem;
+  height: 16rem;
   background: linear-gradient(
     180deg,
-    var(--slate) 0%,
-    #2e2f2e 22%,
-    #6b675c 48%,
-    #b3ac9c 72%,
-    #ddd9cd 88%,
-    var(--paper) 100%
+    #0e1113 0.0%,
+    #101315 7.1%,
+    #17191a 14.3%,
+    #232423 21.4%,
+    #333330 28.6%,
+    #464541 35.7%,
+    #5e5b56 42.9%,
+    #77746e 50.0%,
+    #928f89 57.1%,
+    #aca9a4 64.3%,
+    #c5c3be 71.4%,
+    #dad8d5 78.6%,
+    #eaeae7 85.7%,
+    #f4f4f2 92.9%,
+    #f8f8f6 100.0%
   );
 }
 .bridge-paper-to-dark {
-  height: 9rem;
+  height: 16rem;
   background: linear-gradient(
     180deg,
-    var(--paper) 0%,
-    #ddd9cd 12%,
-    #b3ac9c 28%,
-    #6b675c 52%,
-    #2e2f2e 78%,
-    var(--slate) 100%
+    #f8f8f6 0.0%,
+    #f4f4f2 7.1%,
+    #eaeae7 14.3%,
+    #dad8d5 21.4%,
+    #c5c3be 28.6%,
+    #aca9a4 35.7%,
+    #928f89 42.9%,
+    #77746e 50.0%,
+    #5e5b56 57.1%,
+    #464541 64.3%,
+    #333330 71.4%,
+    #232423 78.6%,
+    #17191a 85.7%,
+    #101315 92.9%,
+    #0e1113 100.0%
   );
 }
 

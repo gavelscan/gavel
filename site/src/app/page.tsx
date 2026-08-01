@@ -122,7 +122,7 @@ export default function Home() {
         </div>
       </LaunchField>
 
-      <div aria-hidden className="bridge-dark-to-paper" />
+      <div aria-hidden className="bridge-dark-to-paper grain" />
 
       {/* ── The finding ────────────────────────────────────────────────── */}
       <section className="bg-paper-warm grain px-6 py-24 sm:px-10 sm:py-32">
@@ -208,7 +208,7 @@ export default function Home() {
         </div>
       </section>
 
-      <div aria-hidden className="bridge-paper-to-dark" />
+      <div aria-hidden className="bridge-paper-to-dark grain" />
 
       {/* ── What gets read ─────────────────────────────────────────────── */}
       <section className="bg-slate-glow grain px-6 py-24 sm:px-10 sm:py-32">
