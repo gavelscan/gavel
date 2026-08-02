@@ -66,5 +66,18 @@ fi
 HEAD_BLOCK=$(python3 -c "import json;print(json.load(open('data/feed.json'))['head'])")
 git -c user.name=gavelscan -c user.email=gavelscan@users.noreply.github.com \
     commit -q -m "data: record refreshed at block ${HEAD_BLOCK}"
-git push -q origin main
+
+# Two writers publish this record (this machine and the Actions cron).
+# If the other one pushed first, reconcile instead of wedging: the files
+# in conflict are all generated, and the copy this run just built from
+# the chain is by definition the current one, so conflicts take ours.
+# Without this, a single divergence silently stopped every later push —
+# nineteen refreshes once piled up locally while the site aged.
+if ! git push -q origin main 2>/dev/null; then
+  say "remote moved; reconciling"
+  git fetch -q origin
+  git -c user.name=gavelscan -c user.email=gavelscan@users.noreply.github.com \
+      merge -q -X ours origin/main -m "merge: reconcile concurrent refresh writers"
+  git push -q origin main
+fi
 say "published at block ${HEAD_BLOCK}"
