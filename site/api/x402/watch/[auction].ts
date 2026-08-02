@@ -11,6 +11,10 @@
  * Robinhood Chain, stateless pass, no facilitator. While no receiving
  * address is configured the endpoint runs in preview mode: free, and the
  * response says so.
+ *
+ * Classic (req, res) Node signature on purpose — the Web-API handler
+ * export crashed this runtime with FUNCTION_INVOCATION_FAILED before a
+ * single line of ours ran.
  */
 
 import {
@@ -27,48 +31,55 @@ const RESOURCE = "/api/x402/watch/{auction}";
 const SEL_LBP_PARAMS = "0xe1d97d1f"; // lbpInitializationParams()
 
 // The static record this deployment also serves. Fetched over HTTP because
-// a Vercel function has no filesystem view of the static assets; same
-// deployment, so this stays within our own edge.
-const RECORD_BASE =
-  process.env.GAVEL_RECORD_BASE || "https://www.gavelscan.xyz";
+// a Vercel function has no filesystem view of the static assets.
+const RECORD_BASE = process.env.GAVEL_RECORD_BASE || "https://www.gavelscan.xyz";
 
-const CORS = {
-  "access-control-allow-origin": "*",
-  "access-control-allow-headers": "x-payment",
-  "access-control-allow-methods": "GET, OPTIONS",
-  "cache-control": "no-store",
-  "content-type": "application/json; charset=utf-8",
+type Req = {
+  method?: string;
+  query: Record<string, string | string[] | undefined>;
+  headers: Record<string, string | string[] | undefined>;
+};
+type Res = {
+  setHeader: (k: string, v: string) => void;
+  status: (n: number) => { json: (b: unknown) => void; end: () => void };
 };
 
-function json(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body, null, 1), { status, headers: CORS });
+function send(res: Res, status: number, body: unknown) {
+  res.setHeader("access-control-allow-origin", "*");
+  res.setHeader("access-control-allow-headers", "x-payment");
+  res.setHeader("access-control-allow-methods", "GET, OPTIONS");
+  res.setHeader("cache-control", "no-store");
+  res.status(status).json(body);
 }
 
-export function OPTIONS(): Response {
-  return new Response(null, { status: 204, headers: CORS });
-}
+export default async function handler(req: Req, res: Res) {
+  if (req.method === "OPTIONS") {
+    res.setHeader("access-control-allow-origin", "*");
+    res.setHeader("access-control-allow-headers", "x-payment");
+    res.setHeader("access-control-allow-methods", "GET, OPTIONS");
+    res.status(204).end();
+    return;
+  }
 
-export async function GET(request: Request): Promise<Response> {
-  const url = new URL(request.url);
-  const auction = (
-    url.pathname.split("/").filter(Boolean).pop() ?? ""
-  ).toLowerCase();
-
+  const raw = req.query.auction;
+  const auction = (Array.isArray(raw) ? raw[0] : raw ?? "").toLowerCase();
   if (!/^0x[0-9a-f]{40}$/.test(auction)) {
-    return json(
-      {
-        error: "path must end in an auction (initializer) address",
-        example: "/api/x402/watch/0xb4c0d8f1cc612487ac36cb07964683a882a43f02",
-      },
-      400,
-    );
+    send(res, 400, {
+      error: "path must end in an auction (initializer) address",
+      example: "/api/x402/watch/0xb4c0d8f1cc612487ac36cb07964683a882a43f02",
+    });
+    return;
   }
 
   // -- the toll booth ---------------------------------------------------
   let pass: { payer: string; paidUsdg: number; expiresAt: string } | null = null;
   if (!PREVIEW) {
-    const header = request.headers.get("x-payment");
-    if (!header) return json(challenge(RESOURCE), 402);
+    const h = req.headers["x-payment"];
+    const header = Array.isArray(h) ? h[0] : h;
+    if (!header) {
+      send(res, 402, challenge(RESOURCE));
+      return;
+    }
     let payment;
     try {
       payment = await verifyPayment(header.trim());
@@ -76,15 +87,16 @@ export async function GET(request: Request): Promise<Response> {
       if (!(error instanceof ChainUnreachable)) throw error;
       // A payment we cannot check is not a payment we can reject. When
       // the chain says nothing, say 503 and leave the caller's pass alone.
-      return json(
-        {
-          error: "could not reach the chain to verify the payment",
-          hint: "your transaction is fine; retry with the same X-PAYMENT header",
-        },
-        503,
-      );
+      send(res, 503, {
+        error: "could not reach the chain to verify the payment",
+        hint: "your transaction is fine; retry with the same X-PAYMENT header",
+      });
+      return;
     }
-    if (!payment.ok) return json({ ...challenge(RESOURCE), rejected: payment.reason }, 402);
+    if (!payment.ok) {
+      send(res, 402, { ...challenge(RESOURCE), rejected: payment.reason });
+      return;
+    }
     pass = { payer: payment.payer, paidUsdg: payment.paidUsdg, expiresAt: payment.expiresAt };
   }
 
@@ -95,9 +107,7 @@ export async function GET(request: Request): Promise<Response> {
     token?: { address?: string; symbol?: string | null };
   } | null = null;
   try {
-    const r = await fetch(`${RECORD_BASE}/v1/launch/${auction}.json`, {
-      cache: "no-store",
-    });
+    const r = await fetch(`${RECORD_BASE}/v1/launch/${auction}.json`, { cache: "no-store" });
     if (r.ok) record = await r.json();
   } catch {
     record = null; // the record is garnish here; the chain is the answer
@@ -111,27 +121,23 @@ export async function GET(request: Request): Promise<Response> {
     code = await rpc<string>("eth_getCode", [auction, "latest"]);
   } catch (error) {
     if (error instanceof ChainUnreachable || error instanceof NodeError) {
-      return json(
-        {
-          error: "could not reach the chain",
-          hint: "no answer is better than a stale one presented as live",
-        },
-        503,
-      );
+      send(res, 503, {
+        error: "could not reach the chain",
+        hint: "no answer is better than a stale one presented as live",
+      });
+      return;
     }
     throw error;
   }
 
   if (!code || code === "0x") {
-    return json(
-      {
-        error: `no contract at ${auction} on chain 4663`,
-        hint: record
-          ? "our record knows this launch but the chain shows no code — check the address"
-          : "not in our record either; is this an initializer address?",
-      },
-      404,
-    );
+    send(res, 404, {
+      error: `no contract at ${auction} on chain 4663`,
+      hint: record
+        ? "our record knows this launch but the chain shows no code — check the address"
+        : "not in our record either; is this an initializer address?",
+    });
+    return;
   }
 
   // The initializer reverts until a clearing price exists — the only way
@@ -141,19 +147,20 @@ export async function GET(request: Request): Promise<Response> {
   let sold: string | null = null;
   let raised: string | null = null;
   try {
-    const raw = await rpc<string>("eth_call", [
+    const out = await rpc<string>("eth_call", [
       { to: auction, data: SEL_LBP_PARAMS },
       "latest",
     ]);
-    if (raw && raw.length >= 2 + 192) {
-      const word = (i: number) => BigInt("0x" + raw.slice(2 + 64 * i, 2 + 64 * (i + 1)));
+    if (out && out.length >= 2 + 192) {
+      const word = (i: number) => BigInt("0x" + out.slice(2 + 64 * i, 2 + 64 * (i + 1)));
       cleared = true;
       sold = word(1).toString();
       raised = word(2).toString();
     }
   } catch (error) {
     if (error instanceof ChainUnreachable) {
-      return json({ error: "could not reach the chain" }, 503);
+      send(res, 503, { error: "could not reach the chain" });
+      return;
     }
     if (!(error instanceof NodeError)) throw error;
     cleared = false; // the node answered: reverted, so no clearing price yet
@@ -163,7 +170,7 @@ export async function GET(request: Request): Promise<Response> {
   const blocksRemaining =
     migrationBlock !== null ? Math.max(0, migrationBlock - head) : null;
 
-  return json({
+  send(res, 200, {
     auction,
     read_at_block: head,
     cleared,

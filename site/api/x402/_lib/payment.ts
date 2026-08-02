@@ -16,8 +16,6 @@
  * free-for-all nobody notices, the second buries the product before launch.
  */
 
-import { recoverMessageAddress } from "viem";
-
 const RPC = process.env.RHC_RPC || "https://rpc.mainnet.chain.robinhood.com";
 const USDG = "0x5fc5360d0400a0fd4f2af552add042d716f1d168";
 const TRANSFER_TOPIC =
@@ -138,6 +136,9 @@ export async function verifyPayment(header: string): Promise<PaymentResult> {
   const payer = "0x" + paid.topics[1].slice(-40);
   let signer: string;
   try {
+    // Lazy so the module loads even if the bundler mishandles viem's ESM
+    // graph — preview mode and the challenge path never need it at all.
+    const { recoverMessageAddress } = await import("viem");
     signer = await recoverMessageAddress({
       message: passMessage(txHash),
       signature: signature as `0x${string}`,
