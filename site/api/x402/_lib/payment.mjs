@@ -14,10 +14,10 @@
  * rest of GAVEL sells (Invariant I7: we never touch funds), applied to our
  * own till: the server can VERIFY payments but cannot spend them.
  *
- * PREVIEW MODE: until a receiving address is configured the endpoint serves
- * answers free, loudly marked as preview. A missing address must never look
- * like a working paywall or a dead endpoint — the first would be a silent
- * free-for-all nobody notices, the second buries the product before launch.
+ * PREVIEW MODE exists for a window like the one before this address
+ * landed: with no address configured the endpoint serves answers free,
+ * loudly marked. Setting GAVEL_PAY_TO="" would re-enter it deliberately;
+ * a deploy can no longer enter it by accident.
  */
 
 const RPC = process.env.RHC_RPC || "https://rpc.mainnet.chain.robinhood.com";
@@ -25,12 +25,18 @@ const USDG = "0x5fc5360d0400a0fd4f2af552add042d716f1d168";
 const TRANSFER_TOPIC =
   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 
-/** Where callers pay. Set via env until the wallet exists; once it does,
- *  hardcode it here the way HATCH did — every 402 response publishes the
- *  address anyway, so an env var buys no secrecy, and a variable missing
- *  from a deploy would leave the endpoint quietly refusing real payments
- *  with no way for anyone outside to tell why. */
-export const PAY_TO = (process.env.GAVEL_PAY_TO || "").toLowerCase();
+/** Where callers pay.
+ *
+ *  In the source rather than in an environment variable, deliberately
+ *  (HATCH's lesson): every 402 response publishes this address anyway, so
+ *  hiding it buys nothing — and a variable missing from a deploy would
+ *  leave the endpoint quietly refusing real payments with no way for
+ *  anyone outside to tell why. Here it is versioned and diffable.
+ *  Checksum verified and confirmed a fresh EOA before it landed. Not the
+ *  HATCH address — one till per product. */
+const DEFAULT_PAY_TO = "0x60630a291130621E3af22F6c1E2FA4D5F5429667";
+
+export const PAY_TO = (process.env.GAVEL_PAY_TO || DEFAULT_PAY_TO).toLowerCase();
 export const PREVIEW = PAY_TO === "";
 
 export const PRICE_USDG = Number(process.env.GAVEL_PRICE_USDG ?? "0.5");
