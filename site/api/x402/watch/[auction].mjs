@@ -12,9 +12,10 @@
  * address is configured the endpoint runs in preview mode: free, and the
  * response says so.
  *
- * Classic (req, res) Node signature on purpose — the Web-API handler
- * export crashed this runtime with FUNCTION_INVOCATION_FAILED before a
- * single line of ours ran.
+ * Plain .mjs with the classic (req, res) signature, on purpose: both the
+ * Web-API export and compiled TypeScript died at module load in this
+ * runtime (FUNCTION_INVOCATION_FAILED before any of our code ran). A
+ * .mjs file has exactly one possible module format.
  */
 
 import {
@@ -25,7 +26,7 @@ import {
   challenge,
   rpc,
   verifyPayment,
-} from "../_lib/payment";
+} from "../_lib/payment.mjs";
 
 const RESOURCE = "/api/x402/watch/{auction}";
 const SEL_LBP_PARAMS = "0xe1d97d1f"; // lbpInitializationParams()
@@ -34,17 +35,7 @@ const SEL_LBP_PARAMS = "0xe1d97d1f"; // lbpInitializationParams()
 // a Vercel function has no filesystem view of the static assets.
 const RECORD_BASE = process.env.GAVEL_RECORD_BASE || "https://www.gavelscan.xyz";
 
-type Req = {
-  method?: string;
-  query: Record<string, string | string[] | undefined>;
-  headers: Record<string, string | string[] | undefined>;
-};
-type Res = {
-  setHeader: (k: string, v: string) => void;
-  status: (n: number) => { json: (b: unknown) => void; end: () => void };
-};
-
-function send(res: Res, status: number, body: unknown) {
+function send(res, status, body) {
   res.setHeader("access-control-allow-origin", "*");
   res.setHeader("access-control-allow-headers", "x-payment");
   res.setHeader("access-control-allow-methods", "GET, OPTIONS");
@@ -52,7 +43,7 @@ function send(res: Res, status: number, body: unknown) {
   res.status(status).json(body);
 }
 
-export default async function handler(req: Req, res: Res) {
+export default async function handler(req, res) {
   if (req.method === "OPTIONS") {
     res.setHeader("access-control-allow-origin", "*");
     res.setHeader("access-control-allow-headers", "x-payment");
@@ -72,7 +63,7 @@ export default async function handler(req: Req, res: Res) {
   }
 
   // -- the toll booth ---------------------------------------------------
-  let pass: { payer: string; paidUsdg: number; expiresAt: string } | null = null;
+  let pass = null;
   if (!PREVIEW) {
     const h = req.headers["x-payment"];
     const header = Array.isArray(h) ? h[0] : h;
@@ -101,11 +92,7 @@ export default async function handler(req: Req, res: Res) {
   }
 
   // -- what our own record knows (context, not the product) --------------
-  let record: {
-    outcome?: string;
-    migration_block?: number;
-    token?: { address?: string; symbol?: string | null };
-  } | null = null;
+  let record = null;
   try {
     const r = await fetch(`${RECORD_BASE}/v1/launch/${auction}.json`, { cache: "no-store" });
     if (r.ok) record = await r.json();
@@ -114,11 +101,11 @@ export default async function handler(req: Req, res: Res) {
   }
 
   // -- the chain, right now ----------------------------------------------
-  let head: number;
-  let code: string | null;
+  let head;
+  let code;
   try {
-    head = parseInt((await rpc<string>("eth_blockNumber", [])) ?? "0x0", 16);
-    code = await rpc<string>("eth_getCode", [auction, "latest"]);
+    head = parseInt((await rpc("eth_blockNumber", [])) ?? "0x0", 16);
+    code = await rpc("eth_getCode", [auction, "latest"]);
   } catch (error) {
     if (error instanceof ChainUnreachable || error instanceof NodeError) {
       send(res, 503, {
@@ -144,15 +131,15 @@ export default async function handler(req: Req, res: Res) {
   // to tell "nobody bid" from "nobody pressed the button". A revert is a
   // fact; only an unreachable node is an unknown.
   let cleared = false;
-  let sold: string | null = null;
-  let raised: string | null = null;
+  let sold = null;
+  let raised = null;
   try {
-    const out = await rpc<string>("eth_call", [
+    const out = await rpc("eth_call", [
       { to: auction, data: SEL_LBP_PARAMS },
       "latest",
     ]);
     if (out && out.length >= 2 + 192) {
-      const word = (i: number) => BigInt("0x" + out.slice(2 + 64 * i, 2 + 64 * (i + 1)));
+      const word = (i) => BigInt("0x" + out.slice(2 + 64 * i, 2 + 64 * (i + 1)));
       cleared = true;
       sold = word(1).toString();
       raised = word(2).toString();

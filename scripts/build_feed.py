@@ -89,7 +89,19 @@ def main():
         if ini in cache and cache[ini].get("v") == CHECKS_VERSION:
             row = cache[ini]
             row["state"] = state  # state can change over time
-            if "cleared" not in row:
+            # The outcome is not cacheable until it is final. A row cached
+            # mid-auction froze at cleared=False forever — fourteen pools
+            # sat on the public site with sold=0, which the auction that
+            # created them plainly contradicts. Live rows move every block;
+            # a not-cleared row whose state says pool/failed is the frozen
+            # bug itself. Only unfilled (past migration, never cleared) and
+            # already-cleared rows are settled facts.
+            needs_outcome = (
+                "cleared" not in row
+                or state == "live"
+                or (not row.get("cleared") and state in ("pool", "failed"))
+            )
+            if needs_outcome:
                 try:
                     o = rpc.auction_outcome(launch["initializer"])
                     row.update(cleared=o["cleared"], sold=o["sold"],
