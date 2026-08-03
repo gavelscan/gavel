@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ApiTerminal from "@/components/ApiTerminal";
 import { FEED, ROWS } from "@/lib/feed";
 
 export const metadata: Metadata = {
@@ -127,14 +128,90 @@ export default function ApiDocs() {
 
       <div aria-hidden className="bridge-paper-to-dark grain" />
 
+      {/* ── The paid lane ─────────────────────────────────────────────── */}
       <section className="bg-slate-glow grain px-6 py-24 sm:px-10">
+        <div className="mx-auto max-w-4xl">
+          <p className="eyebrow mb-6 !text-[#a2937c]">x402 · the paid lane</p>
+          <h2 className="display max-w-[20ch] text-[clamp(1.9rem,4vw,3rem)] text-[#efe8da]">
+            The record is a snapshot. This lane reads the chain now.
+          </h2>
+          <p className="mt-6 max-w-[58ch] text-[15px] text-[#a99a84]">
+            The free files above are rebuilt every few minutes; a bidder
+            deciding inside that window is deciding on old news. This endpoint
+            answers at the current block — has the auction cleared, how much
+            sold, how much raised, how many blocks remain — and never serves a
+            cached answer. Payment is a USDG transfer on Robinhood Chain
+            itself: no account, no API key, no card. The transaction is the
+            receipt.
+          </p>
+
+          <div className="mt-10 grid gap-2 border-t border-[#33291d]">
+            <div className="grid gap-2 border-b border-[#33291d] py-5 md:grid-cols-[22rem_1fr] md:gap-8">
+              <span className="data text-[13px] text-brass-bright">
+                /api/x402/watch/{"{auction}"}
+              </span>
+              <span className="text-[15px] text-[#a99a84]">
+                Live auction state at the block your request lands on. 0.5
+                USDG buys a 7-day pass — the 402 response below is the
+                always-current price sheet.
+              </span>
+            </div>
+          </div>
+
+          <p className="eyebrow mb-6 mt-14 !text-[#a2937c]">How to pay</p>
+          <div className="grid gap-x-10 gap-y-8 md:grid-cols-2">
+            {[
+              [
+                "01",
+                "Ask for the price",
+                "Call the endpoint with no payment header. The 402 answer names the asset, amount and receiving address — never trust a doc page over the challenge itself.",
+              ],
+              [
+                "02",
+                "Pay on-chain, yourself",
+                "Send 0.5 USDG to the payTo address on Robinhood Chain (4663), from any wallet whose key you hold. There is nothing of ours to approve and no contract of ours to call.",
+              ],
+              [
+                "03",
+                "Sign your receipt",
+                'Sign the string gavel-pass:<your tx hash> with the wallet that paid. cast wallet sign "gavel-pass:0x…" works; so does any personal_sign. The signature never goes on-chain.',
+              ],
+              [
+                "04",
+                "Retry with the header",
+                "X-PAYMENT: <tx hash>.<signature> — that is the whole pass. It lasts 7 days from the block your payment landed in, on any request, with no account behind it.",
+              ],
+            ].map(([n, head, body]) => (
+              <div key={n}>
+                <div className="clause">{n}</div>
+                <hr className="my-3 border-0" style={{ height: 1, background: "#33291d" }} />
+                <h3 className="display text-[1.2rem] text-[#efe8da]">{head}</h3>
+                <p className="mt-2 text-[14px] text-[#a99a84]">{body}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="eyebrow mb-4 mt-14 !text-[#a2937c]">Try it, against production</p>
+          <ApiTerminal
+            defaultAuction={(ROWS.find((r) => r.state === "live") ?? SAMPLE).ini}
+          />
+          <p className="mt-4 max-w-[58ch] text-[13px] text-[#7d7263]">
+            Two things worth knowing before you pay: the server can verify
+            payments but cannot spend them — there is no key on it — and
+            signature recovery assumes the paying wallet is an EOA, so a
+            smart-contract wallet (ERC-1271) cannot buy a pass yet.
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-slate-glow-deep grain px-6 py-24 sm:px-10">
         <div className="mx-auto max-w-4xl">
           <p className="eyebrow mb-8 !text-[#a2937c]">Honest limits</p>
           <dl className="border-t border-[#33291d]">
             {[
               [
-                "It is a snapshot, not a stream",
-                `These files are rebuilt from chain state, not served live. The current build was read at block ${FEED.head.toLocaleString("en-US")}. Anything created after that is not in here yet.`,
+                "The free files are a snapshot, not a stream",
+                `They are rebuilt from chain state, not served live. The current build was read at block ${FEED.head.toLocaleString("en-US")}; anything newer is not in them yet. The paid lane above is the exception — it reads the chain at request time.`,
               ],
               [
                 "The ceiling is deterministic; the judge is not published here yet",
