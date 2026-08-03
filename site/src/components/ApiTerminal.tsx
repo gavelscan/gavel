@@ -11,11 +11,51 @@
  * this panel can go stale, the challenge cannot.
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Copyable from "./Copyable";
 
 const API_BASE = "https://www.gavelscan.xyz";
 
 type Result = { status: number | null; body: string; ms: number };
+
+type PriceSheet = {
+  payTo: string;
+  amountUsdg: number;
+  assetSymbol: string;
+  passDays: number | null;
+};
+
+/**
+ * The payment strip is read from the live 402 challenge, never hardcoded:
+ * the page must stay unable to disagree with the endpoint about price or
+ * address. Any well-formed address earns the challenge before the chain
+ * is touched, so this probe costs one round trip and zero RPC calls.
+ */
+function usePriceSheet(): PriceSheet | null {
+  const [sheet, setSheet] = useState<PriceSheet | null>(null);
+  useEffect(() => {
+    let alive = true;
+    fetch(`${API_BASE}/api/x402/watch/0x${"aa".repeat(20)}`, { cache: "no-store" })
+      .then((r) => (r.status === 402 ? r.json() : null))
+      .then((d) => {
+        const a = d?.accepts?.[0];
+        if (alive && a?.payTo && a?.maxAmountRequired) {
+          const days = /(\d+)-day/.exec(a.description ?? "");
+          setSheet({
+            payTo: a.payTo,
+            amountUsdg: Number(a.maxAmountRequired) / 1e6,
+            assetSymbol: a.assetSymbol ?? "USDG",
+            passDays: days ? Number(days[1]) : null,
+          });
+        }
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+  return sheet;
+}
 
 function statusTone(status: number | null): string {
   if (status === null) return "var(--fail)";
@@ -32,6 +72,7 @@ function statusWord(status: number | null): string {
 }
 
 export default function ApiTerminal({ defaultAuction }: { defaultAuction: string }) {
+  const sheet = usePriceSheet();
   const [auction, setAuction] = useState(defaultAuction);
   const [payment, setPayment] = useState("");
   const [out, setOut] = useState<Result | null>(null);
@@ -92,6 +133,20 @@ export default function ApiTerminal({ defaultAuction }: { defaultAuction: string
             spellCheck={false}
           />
         </label>
+        {sheet && (
+          <div className="grid gap-1.5 border border-[#33291d] bg-[#161209] px-4 py-3">
+            <span className="data text-[11px] text-[#7d7263]">
+              pay to — {sheet.amountUsdg} {sheet.assetSymbol} on Robinhood Chain
+              {sheet.passDays ? ` · ${sheet.passDays}-day pass` : ""} · read live
+              from the 402 challenge
+            </span>
+            <Copyable
+              value={sheet.payTo}
+              className="data justify-start break-all text-left text-[13px] text-brass-bright"
+            />
+          </div>
+        )}
+
         <label className="grid gap-1.5">
           <span className="data text-[11px] text-[#7d7263]">
             X-PAYMENT — optional; leave empty to see the 402 price sheet
