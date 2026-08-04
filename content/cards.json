@@ -15,20 +15,20 @@
   "cards": [
     {
       "slug": "record",
-      "headline": "530 launch auctions.",
-      "accent": "111 became pools.",
+      "headline": "588 launch auctions.",
+      "accent": "126 became pools.",
       "subline": "Read directly off Robinhood Chain. No indexer in between.",
       "checks": [
         [
           "total",
-          530
+          588
         ],
         [
           "pool",
-          111
+          126
         ]
       ],
-      "post": "GAVEL is a verdict layer for launch auctions on Robinhood Chain.\n\n530 auctions have run through Uniswap's liquidity launcher. 111 became pools.\n\nWe read every one of them off the chain directly and publish what the parameters actually say.\n\nNo wallet connect. Nothing to approve."
+      "post": "GAVEL is a verdict layer for launch auctions on Robinhood Chain.\n\n588 auctions have run through Uniswap's liquidity launcher. 126 became pools.\n\nWe read every one of them off the chain directly and publish what the parameters actually say.\n\nNo wallet connect. Nothing to approve."
     },
     {
       "slug": "no-event",
@@ -40,20 +40,20 @@
     },
     {
       "slug": "not-neglect",
-      "headline": "398 auctions never cleared.",
+      "headline": "432 auctions never cleared.",
       "accent": "That is not neglect.",
       "subline": "Nobody bid enough for there to be anything to migrate.",
       "checks": [
         [
           "unfilled",
-          398
+          432
         ],
         [
           "total",
-          530
+          588
         ]
       ],
-      "post": "We assumed the gap between 530 auctions and 111 pools was abandonment.\n\nIt is not.\n\nAsking each auction contract directly: 398 never reached a clearing price. Every auction that did clear was migrated. Not one was left sitting.\n\nMost launches simply draw no bids."
+      "post": "We assumed the gap between 588 auctions and 126 pools was abandonment.\n\nIt is not.\n\nAsking each auction contract directly: 432 never reached a clearing price. Every auction that did clear was migrated. Not one was left sitting.\n\nMost launches simply draw no bids."
     },
     {
       "slug": "no-custody",
@@ -89,13 +89,13 @@
     },
     {
       "slug": "live",
-      "headline": "12 auctions are open",
+      "headline": "15 auctions are open",
       "accent": "right now.",
       "subline": "The only page where a reader can still act on what it says.",
       "checks": [
         [
           "live",
-          12
+          15
         ]
       ],
       "post": "Every other page on GAVEL is a record of something already decided.\n\n/live is the one that matters while it still matters: auctions that have not passed their migration block, read straight from the chain in your browser.\n\nThe only page where you can still act on it."
