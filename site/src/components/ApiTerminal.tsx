@@ -16,6 +16,15 @@ import Copyable from "./Copyable";
 
 const API_BASE = "https://www.gavelscan.xyz";
 
+type Eip1193 = {
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+};
+
+function injectedWallet(): Eip1193 | null {
+  const w = window as unknown as { ethereum?: Eip1193 };
+  return w.ethereum ?? null;
+}
+
 type Result = {
   status: number | null;
   body: string;
@@ -82,14 +91,15 @@ export default function ApiTerminal({ defaultAuction }: { defaultAuction: string
   const [payment, setPayment] = useState("");
   const [out, setOut] = useState<Result | null>(null);
   const [busy, setBusy] = useState(false);
+  const [signNote, setSignNote] = useState<string | null>(null);
+  const [signing, setSigning] = useState(false);
 
   const addr = auction.trim().toLowerCase();
   const pay = payment.trim();
   let payHint: string | null = null;
   if (pay && !/^0x[0-9a-fA-F]{64}\.0x[0-9a-fA-F]{130}$/.test(pay)) {
     if (/^0x[0-9a-fA-F]{64}$/.test(pay)) {
-      payHint =
-        "that is the transaction hash alone — append a dot, then the signature over gavel-pass:<hash>";
+      payHint = null; // a bare hash is a fine starting point: the sign button takes it from here
     } else if (/^0x[0-9a-fA-F]{64}0x/.test(pay)) {
       payHint = "missing the dot: the format is <tx hash>.<signature>";
     } else if (/\.0x[0-9a-fA-F]{40}$/.test(pay)) {
@@ -102,6 +112,51 @@ export default function ApiTerminal({ defaultAuction }: { defaultAuction: string
   const curl =
     `curl ${payment.trim() ? `-H "X-PAYMENT: ${payment.trim().slice(0, 18)}…" ` : ""}` +
     `${API_BASE}/api/x402/watch/${addr || "{auction}"}`;
+
+  // In-page signing, because the first real payer paid correctly and then
+  // stalled exactly here: the signature is the one step with no obvious
+  // button anywhere. This is personal_sign over a READABLE ascii string —
+  // the wallet shows the text itself, no transaction is built, no approval
+  // is requested, and nothing here can move funds. Reading verdicts never
+  // touches a wallet; buying a pass may, and only to sign its receipt.
+  async function signWithWallet() {
+    const hash = pay.toLowerCase();
+    const eth = injectedWallet();
+    if (!eth) {
+      setSignNote(
+        "no wallet extension detected — sign with: cast wallet sign " +
+          `"gavel-pass:${hash}"  (or etherscan.io/verifiedSignatures)`,
+      );
+      return;
+    }
+    setSigning(true);
+    setSignNote(null);
+    try {
+      const accounts = (await eth.request({
+        method: "eth_requestAccounts",
+      })) as string[];
+      const account = accounts?.[0];
+      if (!account) throw new Error("no account");
+      const message = `gavel-pass:${hash}`;
+      const hex =
+        "0x" +
+        Array.from(new TextEncoder().encode(message))
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
+      const sig = (await eth.request({
+        method: "personal_sign",
+        params: [hex, account],
+      })) as string;
+      setPayment(`${hash}.${sig}`);
+      setSignNote(
+        "signed — make sure the wallet you signed with is the one that sent the USDG, then send the request",
+      );
+    } catch {
+      setSignNote("signing was cancelled or failed — nothing was sent");
+    } finally {
+      setSigning(false);
+    }
+  }
 
   async function run() {
     setBusy(true);
@@ -187,6 +242,26 @@ export default function ApiTerminal({ defaultAuction }: { defaultAuction: string
             <span className="data text-[11px]" style={{ color: "var(--fail)" }}>
               {payHint}
             </span>
+          )}
+          {/^0x[0-9a-fA-F]{64}$/.test(pay) && (
+            <div className="mt-1 grid gap-1.5">
+              <button
+                type="button"
+                onClick={signWithWallet}
+                disabled={signing}
+                className="data w-fit border border-[#33291d] px-5 py-2 text-[12px] text-[#efe8da] transition-colors hover:border-brass-bright disabled:opacity-40"
+              >
+                {signing ? "waiting for the wallet…" : "sign with wallet →"}
+              </button>
+              <span className="data text-[11px] text-[#5d5344]">
+                signature only: your wallet shows the text gavel-pass:&lt;hash&gt;
+                and signs it. no transaction, no approval, nothing that can move
+                funds.
+              </span>
+            </div>
+          )}
+          {signNote && (
+            <span className="data break-all text-[11px] text-[#a2937c]">{signNote}</span>
           )}
         </label>
 

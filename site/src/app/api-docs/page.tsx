@@ -174,7 +174,7 @@ export default function ApiDocs() {
               [
                 "03",
                 "Sign your receipt",
-                'Sign the string gavel-pass:<your tx hash> with the wallet that paid. cast wallet sign "gavel-pass:0x…" works; so does any personal_sign. The signature never goes on-chain.',
+                "Paste your tx hash into the panel below and press sign with wallet — your wallet shows the text gavel-pass:<hash> and signs it, nothing more. cast wallet sign works too. The signature never goes on-chain.",
               ],
               [
                 "04",
