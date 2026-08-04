@@ -34,13 +34,16 @@ export const metadata: Metadata = {
   title: "GAVEL",
   description:
     "Every launch auction on Robinhood Chain, read before the money moves. One verdict per launch: PASS, FLAG or FAIL.",
-  icons: { icon: "/brand/favicon.ico" },
   openGraph: {
     title: "GAVEL",
     description:
       "Every launch auction on Robinhood Chain, read before the money moves.",
     type: "website",
   },
+  // Domain-ownership proof for the Virtuals platform. Site-scoped: Fides
+  // and HATCH each carry their own token; this one is gavelscan.xyz's.
+  // Ownership of the domain is all it asserts.
+  other: { "virtual-protocol-site-verification": "283b53f4247ef31c458d433748589f83" },
 };
 
 export default function RootLayout({
