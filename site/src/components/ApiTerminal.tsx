@@ -16,7 +16,12 @@ import Copyable from "./Copyable";
 
 const API_BASE = "https://www.gavelscan.xyz";
 
-type Result = { status: number | null; body: string; ms: number };
+type Result = {
+  status: number | null;
+  body: string;
+  ms: number;
+  rejected: string | null;
+};
 
 type PriceSheet = {
   payTo: string;
@@ -79,6 +84,21 @@ export default function ApiTerminal({ defaultAuction }: { defaultAuction: string
   const [busy, setBusy] = useState(false);
 
   const addr = auction.trim().toLowerCase();
+  const pay = payment.trim();
+  let payHint: string | null = null;
+  if (pay && !/^0x[0-9a-fA-F]{64}\.0x[0-9a-fA-F]{130}$/.test(pay)) {
+    if (/^0x[0-9a-fA-F]{64}$/.test(pay)) {
+      payHint =
+        "that is the transaction hash alone — append a dot, then the signature over gavel-pass:<hash>";
+    } else if (/^0x[0-9a-fA-F]{64}0x/.test(pay)) {
+      payHint = "missing the dot: the format is <tx hash>.<signature>";
+    } else if (/\.0x[0-9a-fA-F]{40}$/.test(pay)) {
+      payHint =
+        "the part after the dot looks like an address — it must be a 130-hex-char signature, made by signing gavel-pass:<your tx hash> with the wallet that paid";
+    } else {
+      payHint = "expected <64-hex tx hash>.<130-hex signature>";
+    }
+  }
   const curl =
     `curl ${payment.trim() ? `-H "X-PAYMENT: ${payment.trim().slice(0, 18)}…" ` : ""}` +
     `${API_BASE}/api/x402/watch/${addr || "{auction}"}`;
@@ -93,17 +113,22 @@ export default function ApiTerminal({ defaultAuction }: { defaultAuction: string
       });
       const text = await res.text();
       let body = text;
+      let rejected: string | null = null;
       try {
-        body = JSON.stringify(JSON.parse(text), null, 2);
+        const parsed = JSON.parse(text);
+        body = JSON.stringify(parsed, null, 2);
+        // The one line a paying caller must not have to dig for.
+        if (typeof parsed?.rejected === "string") rejected = parsed.rejected;
       } catch {
         /* non-JSON error page: show it as-is */
       }
-      setOut({ status: res.status, body, ms: performance.now() - t0 });
+      setOut({ status: res.status, body, ms: performance.now() - t0, rejected });
     } catch {
       setOut({
         status: null,
         body: "network error — the endpoint could not be reached from this browser",
         ms: performance.now() - t0,
+        rejected: null,
       });
     } finally {
       setBusy(false);
@@ -158,6 +183,11 @@ export default function ApiTerminal({ defaultAuction }: { defaultAuction: string
             placeholder="0x<txhash>.0x<signature>"
             spellCheck={false}
           />
+          {payHint && (
+            <span className="data text-[11px]" style={{ color: "var(--fail)" }}>
+              {payHint}
+            </span>
+          )}
         </label>
 
         <div className="mt-1 flex flex-wrap items-center gap-4">
@@ -182,6 +212,13 @@ export default function ApiTerminal({ defaultAuction }: { defaultAuction: string
             </span>
             <span className="data text-[11px] text-[#5d5344]">{Math.round(out.ms)} ms</span>
           </div>
+          {out.rejected && (
+            <div className="px-5 pb-3">
+              <span className="data text-[12px]" style={{ color: "var(--fail)" }}>
+                rejected: {out.rejected}
+              </span>
+            </div>
+          )}
           <pre className="data max-h-96 overflow-auto border-t border-[#33291d] bg-[#0d0b08] p-5 text-[12px] leading-relaxed text-[#cfc6b4]">
             {out.body}
           </pre>
