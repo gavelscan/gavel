@@ -1,1 +1,1 @@
-{"addr":"0x44122f20abecf8238b1934fe4aff67e22ebf97ff","n":1,"pool":0,"failed":0,"live":1,"silent":0,"median_lp":0.5,"is_contract":false,"first_block":28365205,"last_block":28365205,"tokens":[{"sym":"USDG","ini":"0x6fb45c5bb8dc2d4235e9c14831ab423cafda49b0","state":"live","ceiling":"FLAG"}]}
+{"addr":"0x44122f20abecf8238b1934fe4aff67e22ebf97ff","n":1,"pool":0,"failed":1,"live":0,"silent":0,"median_lp":0.5,"is_contract":false,"first_block":28365205,"last_block":28365205,"tokens":[{"sym":"USDG","ini":"0x6fb45c5bb8dc2d4235e9c14831ab423cafda49b0","state":"failed","ceiling":"FLAG"}]}
