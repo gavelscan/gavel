@@ -1,1 +1,1 @@
-{"addr":"0xbcd069ab50eccdfd8b5e862458b96eb0549f852a","n":1,"pool":0,"failed":0,"live":1,"silent":0,"median_lp":0.5,"is_contract":false,"first_block":28694876,"last_block":28694876,"tokens":[{"sym":"DG","ini":"0x89995856285f902e5c1df318b5e5e9189a8235a3","state":"live","ceiling":"FLAG"}]}
+{"addr":"0xbcd069ab50eccdfd8b5e862458b96eb0549f852a","n":1,"pool":0,"failed":0,"live":0,"silent":0,"median_lp":0.5,"is_contract":false,"first_block":28694876,"last_block":28694876,"tokens":[{"sym":"DG","ini":"0x89995856285f902e5c1df318b5e5e9189a8235a3","state":"unfilled","ceiling":"FLAG"}]}
