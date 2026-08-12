@@ -1,7 +1,31 @@
 {
+ "0x03bc731ffb162cdd7b98d3c6542bfc291126075d": {
+  "name": "Firefly Aerospace Inc. \u2022 Robinhood Token",
+  "symbol": "FLY"
+ },
+ "0x03dfbbe0ac4e7bcdafd08ed41a400326b77d8c80": {
+  "name": "Johnson & Johnson \u2022 Robinhood Token",
+  "symbol": "JNJ"
+ },
+ "0x0594134df3f171a354d9c85ebd65b7a6148f6d09": {
+  "name": "Vanguard Morningstar Total Stock Market ETF \u2022 Robinhood Token",
+  "symbol": "VTI"
+ },
+ "0x05a3d1cd21d0c88145e82600e62e7e496e0f222b": {
+  "name": "AMC Entertainment \u2022 Robinhood Token",
+  "symbol": "AMC"
+ },
  "0x05b37fb53a299a1b874a619e1c4c404d52c36f4c": {
   "name": "Reddit \u2022 Robinhood Token",
   "symbol": "RDDT"
+ },
+ "0x072f979c2cac8e1391b0162a87fee094bf8744a0": {
+  "name": "VanEck Semiconductor ETF \u2022 Robinhood Token",
+  "symbol": "SMH"
+ },
+ "0x0b5fb4031cae9163db10b169ee72685f0edc8545": {
+  "name": "Trade Desk \u2022 Robinhood Token",
+  "symbol": "TTD"
  },
  "0x0c3260af4b8f13a69c4c2dfb84fd667890cdfa14": {
   "name": "ServiceNow \u2022 Robinhood Token",
@@ -15,13 +39,25 @@
   "name": "Qualcomm \u2022 Robinhood Token",
   "symbol": "QCOM"
  },
+ "0x116f00968269b7bfbad4109ce591d6e74c0601d4": {
+  "name": "Cloudflare \u2022 Robinhood Token",
+  "symbol": "NET"
+ },
  "0x117cc2133c37b721f49de2a7a74833232b3b4c0c": {
   "name": "SPDR S&P 500 ETF Trust \u2022 Robinhood Token",
   "symbol": "SPY"
  },
+ "0x12e3c047bf9aecaf9ddc98c05c31bfd1dd043993": {
+  "name": "Kohls Corporation \u2022 Robinhood Token",
+  "symbol": "KSS"
+ },
  "0x12f190a9f9d7d37a250758b26824b97ce941bf54": {
   "name": "Amazon \u2022 Robinhood Token",
   "symbol": "AMZN"
+ },
+ "0x141eea040c2250eec0314e336975e81f85f6585e": {
+  "name": "AXT \u2022 Robinhood Token",
+  "symbol": "AXTI"
  },
  "0x156e175dd063a8ce274c50654ef40e0032b3fbcf": {
   "name": "Broadcom \u2022 Robinhood Token",
@@ -39,13 +75,41 @@
   "name": "GameStop \u2022 Robinhood Token",
   "symbol": "GME"
  },
+ "0x1c690498150252222c275a5ced69d3a6b1f52d5e": {
+  "name": "iShares MSCI Taiwan Capped ETF \u2022 Robinhood Token",
+  "symbol": "EWT"
+ },
  "0x1cdad396db64bda184d5182a97dd9b3c62100b7d": {
   "name": "Everpure \u2022 Robinhood Token",
   "symbol": "P"
  },
+ "0x1d11f0496982706c5e14a514d4e79f2e6bde4516": {
+  "name": "Trump Media & Technology Group \u2022 Robinhood Token",
+  "symbol": "DJT"
+ },
+ "0x1eebee7f74517e0279dfb09d25b0407beec3fdd6": {
+  "name": "NuScale Power \u2022 Robinhood Token",
+  "symbol": "SMR"
+ },
+ "0x232b8ed6377be97813853b0ac104c4cda8378d1b": {
+  "name": "Adobe \u2022 Robinhood Token",
+  "symbol": "ADBE"
+ },
+ "0x237c16d66590f67b886d978acd362eaead8b18c7": {
+  "name": "Powell Industries \u2022 Robinhood Token",
+  "symbol": "POWL"
+ },
  "0x25c288e6d899b9bc30160965ad9644c67e73be0c": {
   "name": "Ford Motor \u2022 Robinhood Token",
   "symbol": "F"
+ },
+ "0x26dcbfb34fc83cabd6990f449674efdc6097ff85": {
+  "name": "ViaSat \u2022 Robinhood Token",
+  "symbol": "VSAT"
+ },
+ "0x2778c5024d5ca2cdb0f8ead671ffc69963adcd9c": {
+  "name": "Teradyne \u2022 Robinhood Token",
+  "symbol": "TER"
  },
  "0x27c99fbde9d0d2aa4f4bfb4943f237843ddf6958": {
   "name": "Datadog \u2022 Robinhood Token",
@@ -59,17 +123,49 @@
   "name": "Rigetti Computing \u2022 Robinhood Token",
   "symbol": "RGTI"
  },
+ "0x285b231728c7e4333799183df1094d775246a535": {
+  "name": "SELLAS Life Sciences \u2022 Robinhood Token",
+  "symbol": "SLS"
+ },
+ "0x28babd556b60e53663b8615036479a29c2cdd1bf": {
+  "name": "Arista \u2022 Robinhood Token",
+  "symbol": "ANET"
+ },
+ "0x2d427692e928fa156ec22acfabafa0447c5805b7": {
+  "name": "Galaxy Digital Inc. \u2022 Robinhood Token",
+  "symbol": "GLXY"
+ },
  "0x2e0847e8910a9732eb3fb1bb4b70a580adad4fe3": {
   "name": "Alphabet Class A \u2022 Robinhood Token",
   "symbol": "GOOGL"
+ },
+ "0x2f62fc9fabb470c690f141c28340ed832bb27020": {
+  "name": "Vanguard Total Bond Market ETF \u2022 Robinhood Token",
+  "symbol": "BND"
+ },
+ "0x3139d77ace0cbaa5bdfd38bd1f1911a794af0b0e": {
+  "name": "Abcellera Biologics \u2022 Robinhood Token",
+  "symbol": "ABCL"
  },
  "0x322f0929c4625ed5bad873c95208d54e1c003b2d": {
   "name": "Tesla \u2022 Robinhood Token",
   "symbol": "TSLA"
  },
+ "0x329fcaceb9ad6f9580dd5f643fed0646900d043c": {
+  "name": "Lockheed \u2022 Robinhood Token",
+  "symbol": "LMT"
+ },
+ "0x348be1a8663f15edde5cdf8a96bb69078f7ab6fd": {
+  "name": "TeraWulf \u2022 Robinhood Token",
+  "symbol": "WULF"
+ },
  "0x36046893810a7e7fce501229d57dc3fc8c8716d0": {
   "name": "Applied Materials \u2022 Robinhood Token",
   "symbol": "AMAT"
+ },
+ "0x373c06c4f7bde527d7dae4ba169e42b55e393ced": {
+  "name": "Aurora Innovation \u2022 Robinhood Token",
+  "symbol": "AUR"
  },
  "0x39ec44bee4f6a116c6f9b8de566848a985c53c60": {
   "name": "e.l.f. Beauty \u2022 Robinhood Token",
@@ -79,9 +175,17 @@
   "name": "Rocket Lab Corporation \u2022 Robinhood Token",
   "symbol": "RKLB"
  },
+ "0x3fb8976980d486084b2eb4a404bd12e72823958f": {
+  "name": "Fortinet \u2022 Robinhood Token",
+  "symbol": "FTNT"
+ },
  "0x408c14038a04f7bd235329e26d2bf569ee20e250": {
   "name": "Nu \u2022 Robinhood Token",
   "symbol": "NU"
+ },
+ "0x40e7a279850e443f582059ae5dc1c3b6563e6395": {
+  "name": "Ouster \u2022 Robinhood Token",
+  "symbol": "OUST"
  },
  "0x411efb0e7f985935daec3d4c3ebaea0d0ad7d89f": {
   "name": "iShares Silver Trust \u2022 Robinhood Token",
@@ -91,9 +195,21 @@
   "name": "Permian Resources \u2022 Robinhood Token",
   "symbol": "PR"
  },
+ "0x41f4267525a8aff329540ef24fd83d9044758b33": {
+  "name": "Figma \u2022 Robinhood Token",
+  "symbol": "FIG"
+ },
+ "0x43b07d15ce533bec5476d70c22a78a1b2b662155": {
+  "name": "Moderna \u2022 Robinhood Token",
+  "symbol": "MRNA"
+ },
  "0x44c4f142009036cf477ed2d09932051843137cf1": {
   "name": "Zoom \u2022 Robinhood Token",
   "symbol": "ZM"
+ },
+ "0x44f6d488021f8233b9416294d1fe9b1fee28382d": {
+  "name": "Ciena \u2022 Robinhood Token",
+  "symbol": "CIEN"
  },
  "0x47f93d52cbec7c6d2cfc080e154002370a60daea": {
   "name": "ASML Holding NV \u2022 Robinhood Token",
@@ -103,6 +219,14 @@
   "name": "MaxLinear \u2022 Robinhood Token",
   "symbol": "MXL"
  },
+ "0x48d60243c66437c6ac3c2495be94747aed5dfe25": {
+  "name": "L3Harris \u2022 Robinhood Token",
+  "symbol": "LHX"
+ },
+ "0x48e39e56acdba37b09020c0b734a613c9a2f100a": {
+  "name": "Blackberry \u2022 Robinhood Token",
+  "symbol": "BB"
+ },
  "0x4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea": {
   "name": "Space Exploration Technologies Corp. Class A Common Stock \u2022 Robinhood Token",
   "symbol": "SPCX"
@@ -110,6 +234,10 @@
  "0x4d21483a44bf67a86b77e3da301411880797d452": {
   "name": "Boeing \u2022 Robinhood Token",
   "symbol": "BA"
+ },
+ "0x4d67253bc223e6b0e104f1084c1fb2b669ddc41b": {
+  "name": "Credo Technology Group \u2022 Robinhood Token",
+  "symbol": "CRDO"
  },
  "0x4e62068525ab11fe768e29dfd00ef909b9803016": {
   "name": "Lululemon \u2022 Robinhood Token",
@@ -123,13 +251,25 @@
   "name": "Applied Optoelectronics \u2022 Robinhood Token",
   "symbol": "AAOI"
  },
+ "0x52d50d0280ad1054b43f052bd70a49a212a1b128": {
+  "name": "Monolithic Power Systems \u2022 Robinhood Token",
+  "symbol": "MPWR"
+ },
  "0x558378e000d634a36593e338ebacdd6207640efe": {
   "name": "IonQ \u2022 Robinhood Token",
   "symbol": "IONQ"
  },
+ "0x561e2a49212b7ccf47f2744ccb83e200722fadbc": {
+  "name": "Vistra \u2022 Robinhood Token",
+  "symbol": "VST"
+ },
  "0x56d23bee5f41a7120170b0c603dae30128e460e9": {
   "name": "Intuit \u2022 Robinhood Token",
   "symbol": "INTU"
+ },
+ "0x57b0030166db0c31690d1a5aa167e2e26e2c29a4": {
+  "name": "Lam Research Corp \u2022 Robinhood Token",
+  "symbol": "LRCX"
  },
  "0x58ffe4a942d3885baa22d7520691f611ef09e7aa": {
   "name": "Taiwan Semiconductor Manufacturing \u2022 Robinhood Token",
@@ -138,6 +278,14 @@
  "0x59818904ab4ce163b3ce4ffb64f2d6ca02c434b4": {
   "name": "Quantum Computing \u2022 Robinhood Token",
   "symbol": "QUBT"
+ },
+ "0x59dd09d4900c2e4b5f75b7c0d4e6796fcc234cb1": {
+  "name": "HP Enterprise \u2022 Robinhood Token",
+  "symbol": "HPE"
+ },
+ "0x5b97476b922f3305131b8f0b9d333172e87f4aae": {
+  "name": "Atlassian Corporation \u2022 Robinhood Token",
+  "symbol": "TEAM"
  },
  "0x5c90450bbb4273d7b2f17cf6917aeb237a569679": {
   "name": "Cerebras Systems \u2022 Robinhood Token",
@@ -151,6 +299,18 @@
   "name": "CoreWeave \u2022 Robinhood Token",
   "symbol": "CRWV"
  },
+ "0x5f604fba1162193a4388a5dfa56f556f3e133cc2": {
+  "name": "Aehr \u2022 Robinhood Token",
+  "symbol": "AEHR"
+ },
+ "0x6006ed4b2f94110851ff7509d97d034f0eed9226": {
+  "name": "Vicor \u2022 Robinhood Token",
+  "symbol": "VICR"
+ },
+ "0x62200915e7deab1ec7f79fb246dadbb80eacddd0": {
+  "name": "Clover Health Investments \u2022 Robinhood Token",
+  "symbol": "CLOV"
+ },
  "0x62fd0668e10d8b72339be2dcf7643001688ff13b": {
   "name": "Marvell Technology \u2022 Robinhood Token",
   "symbol": "MRVL"
@@ -159,13 +319,45 @@
   "name": "Coinbase \u2022 Robinhood Token",
   "symbol": "COIN"
  },
+ "0x63b814ddbd6bf339f25fed8c36158a008d5b373e": {
+  "name": "General Electric \u2022 Robinhood Token",
+  "symbol": "GE"
+ },
+ "0x63d5a3b6939a33f1e75d8bcd85759858239600db": {
+  "name": "Cognizant \u2022 Robinhood Token",
+  "symbol": "CTSH"
+ },
+ "0x6e3dfd9f7e1649baa14d25cac18c94d62db10a54": {
+  "name": "SoundHound AI \u2022 Robinhood Token",
+  "symbol": "SOUN"
+ },
+ "0x7066a64c24e4206cd62e83bf198c1e7eb361f51e": {
+  "name": "Pfizer \u2022 Robinhood Token",
+  "symbol": "PFE"
+ },
+ "0x748c32c3ca24edf31ea597db1f3d330a7a6da3dc": {
+  "name": "Astera Labs, Inc. \u2022 Robinhood Token",
+  "symbol": "ALAB"
+ },
+ "0x756bc80af765c82da966a788858d65adf14f3793": {
+  "name": "Sunrun \u2022 Robinhood Token",
+  "symbol": "RUN"
+ },
  "0x75742c18bc1f1c5c5f448f4c9d9c6f66dafaaa38": {
   "name": "iShares Semiconductor ETF \u2022 Robinhood Token",
   "symbol": "SOXX"
  },
+ "0x77e655e37f4d913fb9540e0d541d824171a60e81": {
+  "name": "Silicon Motion \u2022 Robinhood Token",
+  "symbol": "SIMO"
+ },
  "0x7c04e6a3368f2a1de3874f0e80d2e0a1a9915da6": {
   "name": "Corning \u2022 Robinhood Token",
   "symbol": "GLW"
+ },
+ "0x7c148f74ac7445d1f28366b7fcdc6792a9fcd0cf": {
+  "name": "ImmunityBio, \u2022 Robinhood Token",
+  "symbol": "IBRX"
  },
  "0x7dc013eb55e436f30d7ed1afe4e36d6e45e3c3f7": {
   "name": "Zscaler \u2022 Robinhood Token",
@@ -174,6 +366,10 @@
  "0x7f0abef0c07280f82c6a08ead09ded6bae2c13fc": {
   "name": "iShares MSCI South Korea fund \u2022 Robinhood Token",
   "symbol": "EWY"
+ },
+ "0x7fd06a4d81ccfa3f351394e144d5191874c31313": {
+  "name": "Kratos Defense & Security Solutions \u2022 Robinhood Token",
+  "symbol": "KTOS"
  },
  "0x8005d266423c7ea827372c9c864491e5786600ea": {
   "name": "Eli Lilly \u2022 Robinhood Token",
@@ -203,6 +399,10 @@
   "name": "Tower Semiconductor \u2022 Robinhood Token",
   "symbol": "TSEM"
  },
+ "0x8b2f88497f15a18e9d4ffa1a8ffb8538399ae774": {
+  "name": "Oklo \u2022 Robinhood Token",
+  "symbol": "OKLO"
+ },
  "0x8cf07c5a878945185d327aaa6e33faa95f95e7bf": {
   "name": "Celsius \u2022 Robinhood Token",
   "symbol": "CELH"
@@ -211,17 +411,33 @@
   "name": "Lumentum \u2022 Robinhood Token",
   "symbol": "LITE"
  },
+ "0x8ff63eaeee3fe54ba450c4f5538064ec5a893aef": {
+  "name": "Onto Innovation \u2022 Robinhood Token",
+  "symbol": "ONTO"
+ },
  "0x92ef19e82bd8ff36661de838d5eae7e5cef0effe": {
   "name": "Redwire \u2022 Robinhood Token",
   "symbol": "RDW"
+ },
+ "0x92f9f459f1a9a5ad266b182be7bffd1c6c666894": {
+  "name": "Coherent \u2022 Robinhood Token",
+  "symbol": "COHR"
  },
  "0x92fd66527192e3e61d4ddd13322aa222de86f9b5": {
   "name": "iShares 0-3 Month Treasury Bond \u2022 Robinhood Token",
   "symbol": "SGOV"
  },
+ "0x93dbb1d2dc5d63f4abacff30485273f538df68ac": {
+  "name": "Comfort Systems \u2022 Robinhood Token",
+  "symbol": "FIX"
+ },
  "0x941ae714ec6d8130c7b75d67160ca08f1e7d11dd": {
   "name": "Dell \u2022 Robinhood Token",
   "symbol": "DELL"
+ },
+ "0x94b8aae43a1ccc08aa64b7d1f29b4d920af4a0c9": {
+  "name": "GE Vernova \u2022 Robinhood Token",
+  "symbol": "GEV"
  },
  "0x95052ddcd5dc25641657424a8cf04834997e1730": {
   "name": "EchoStar \u2022 Robinhood Token",
@@ -231,9 +447,25 @@
   "name": "Carnival Corporation \u2022 Robinhood Token",
   "symbol": "CCL"
  },
+ "0x96b933c74ecb4a0926b9210cef7b743ef46be2e9": {
+  "name": "KLA \u2022 Robinhood Token",
+  "symbol": "KLAC"
+ },
+ "0x980dcf6766fa79f5cf0c4aadb3ab477ff15a9619": {
+  "name": "IBM \u2022 Robinhood Token",
+  "symbol": "IBM"
+ },
  "0x98e75885157c80992a8d41b696d8c9c6fb30a926": {
   "name": "SoFi Technologies \u2022 Robinhood Token",
   "symbol": "SOFI"
+ },
+ "0x99d9d8663545151603863c5acbd6fc3218899009": {
+  "name": "Ambarella \u2022 Robinhood Token",
+  "symbol": "AMBA"
+ },
+ "0x9ab02ead789b6903c3c44d0ed32f9c707cdf12fd": {
+  "name": "Quanta \u2022 Robinhood Token",
+  "symbol": "PWR"
  },
  "0x9b23573b156b52565012f5ce02cdf60afbaa70be": {
   "name": "Penguin Solutions \u2022 Robinhood Token",
@@ -243,9 +475,29 @@
   "name": "Nebius Group \u2022 Robinhood Token",
   "symbol": "NBIS"
  },
+ "0x9e7abd3c9139d14e4c86dce0e455aab7a0c2fb3e": {
+  "name": "WhiteFiber, Inc. \u2022 Robinhood Token",
+  "symbol": "WYFI"
+ },
+ "0x9ece29a4a2397c0a35fb5fa8ee2b9509130a98cc": {
+  "name": "Fiserv \u2022 Robinhood Token",
+  "symbol": "FISV"
+ },
+ "0xa249baf1063af884807c1e1400aef7784836917e": {
+  "name": "AppLovin \u2022 Robinhood Token",
+  "symbol": "APP"
+ },
  "0xa30fa36db767ad9ed3f7a60fc79526fb4d56d344": {
   "name": "United States Oil Fund \u2022 Robinhood Token",
   "symbol": "USO"
+ },
+ "0xa48f22a46c0f1c46ca7d111cb6c137c271987180": {
+  "name": "Fair Isaac \u2022 Robinhood Token",
+  "symbol": "FICO"
+ },
+ "0xa4f319104089fe321dc8093c6e707d4fe190a988": {
+  "name": "Carvana \u2022 Robinhood Token",
+  "symbol": "CVNA"
  },
  "0xa5d4968421ba94814be3b136b15cf422101ac1a3": {
   "name": "Intuitive Machines \u2022 Robinhood Token",
@@ -255,6 +507,14 @@
   "name": "Xanadu Quantum \u2022 Robinhood Token",
   "symbol": "XNDU"
  },
+ "0xaa4d64474c172010ab57719cb9951e6142a100d3": {
+  "name": "Planet Labs \u2022 Robinhood Token",
+  "symbol": "PL"
+ },
+ "0xacef2e09adb47ad6abebad9ff06689e60615c2b6": {
+  "name": "iShares MSCI India ETF \u2022 Robinhood Token",
+  "symbol": "INDA"
+ },
  "0xad25ac6c84d497db898fa1e8387bf6af3532a1c4": {
   "name": "Alibaba \u2022 Robinhood Token",
   "symbol": "BABA"
@@ -263,17 +523,45 @@
   "name": "Invesco S&P 500 Momentum ETF \u2022 Robinhood Token",
   "symbol": "SPMO"
  },
+ "0xae517a2903e68bd929dfd15be875f8369d53e94a": {
+  "name": "Constellation Energy \u2022 Robinhood Token",
+  "symbol": "CEG"
+ },
+ "0xaea445c5f3db1a462998ccc422a875a361ee5d99": {
+  "name": "Howmet Aerospace \u2022 Robinhood Token",
+  "symbol": "HWM"
+ },
  "0xaf3d76f1834a1d425780943c99ea8a608f8a93f9": {
   "name": "Apple \u2022 Robinhood Token",
   "symbol": "AAPL"
+ },
+ "0xb039597ed45cba7b6e2fb9e8be51802969cee5be": {
+  "name": "Palo Alto Networks \u2022 Robinhood Token",
+  "symbol": "PANW"
  },
  "0xb0992820e760d836549ba69bc7598b4af75dee03": {
   "name": "Oracle \u2022 Robinhood Token",
   "symbol": "ORCL"
  },
+ "0xb1969f6604ca1ae7a2cd3f1827876e914594ca2d": {
+  "name": "T1 Energy \u2022 Robinhood Token",
+  "symbol": "TE"
+ },
  "0xb1bf26c1d20ff267a4f93550d1e0d06ac40a114b": {
   "name": "Rivian Automotive \u2022 Robinhood Token",
   "symbol": "RIVN"
+ },
+ "0xb1cc0ec7db69cf43539119814df40071b9d61793": {
+  "name": "Tempus AI \u2022 Robinhood Token",
+  "symbol": "TEM"
+ },
+ "0xb334c5ce741b80b5b671f47f5c269cb193fe8e24": {
+  "name": "Joby Aviation \u2022 Robinhood Token",
+  "symbol": "JOBY"
+ },
+ "0xb853bc83a753342a4f8320ea680b4b1e84118d21": {
+  "name": "Infleqtion \u2022 Robinhood Token",
+  "symbol": "INFQ"
  },
  "0xb8dbf92f9741c9ac1c32115e78581f23509916fd": {
   "name": "Applied Digital \u2022 Robinhood Token",
@@ -283,6 +571,18 @@
   "name": "Sandisk Corporation \u2022 Robinhood Token",
   "symbol": "SNDK"
  },
+ "0xba0cab75495255d0cb58e22b648bfed4ecd1f47e": {
+  "name": "Snowflake \u2022 Robinhood Token",
+  "symbol": "SNOW"
+ },
+ "0xbbd09f72b025360fee5c928053dca6248d35be54": {
+  "name": "ON Semiconductor \u2022 Robinhood Token",
+  "symbol": "ON"
+ },
+ "0xbe274710bf3d9567e1b290ef6a5f9f90ca016fd8": {
+  "name": "iShares 1-3 Year Treasury Bond ETF \u2022 Robinhood Token",
+  "symbol": "SHY"
+ },
  "0xbe6702d7b70315376dc48a3293f24f0982f86386": {
   "name": "Navitas Semiconductor \u2022 Robinhood Token",
   "symbol": "NVTS"
@@ -291,25 +591,61 @@
   "name": "Nano Nuclear Energy \u2022 Robinhood Token",
   "symbol": "NNE"
  },
+ "0xbf449977089c718c004a66c554b26b94ef3ad4de": {
+  "name": "Celestica \u2022 Robinhood Token",
+  "symbol": "CLS"
+ },
  "0xc01aa1fecec0605b13bc84874ff7256c0f5f562a": {
   "name": "Super Micro Computer \u2022 Robinhood Token",
   "symbol": "SMCI"
+ },
+ "0xc02f12b9fe9e707079ec0d546f3050d3f6c1f8bd": {
+  "name": "DigitalOcean \u2022 Robinhood Token",
+  "symbol": "DOCN"
  },
  "0xc0d6457c16cc70d6790dd43521c899c87ce02f35": {
   "name": "Meta Platforms \u2022 Robinhood Token",
   "symbol": "META"
  },
+ "0xc27dbd474af5181c5a8777903690d8d262d12648": {
+  "name": "Axon \u2022 Robinhood Token",
+  "symbol": "AXON"
+ },
  "0xc583c60aef9dc401da72cec1b404743a93cea1cc": {
   "name": "D-Wave Quantum Inc. Common Stock \u2022 Robinhood Token",
   "symbol": "QBTS"
+ },
+ "0xc6cbad1016b38b797610c25e1dc7d95988b1f362": {
+  "name": "Modine \u2022 Robinhood Token",
+  "symbol": "MOD"
  },
  "0xc72b96e0e48ecd4dc75e1e45396e26300bc39681": {
   "name": "Intel \u2022 Robinhood Token",
   "symbol": "INTC"
  },
+ "0xc93f4d80e268ab922e871bd169156c3cc41894e6": {
+  "name": "MACOM \u2022 Robinhood Token",
+  "symbol": "MTSI"
+ },
+ "0xc9a981fee1f9dec688bb123ccdecc63d0debfc4e": {
+  "name": "SPDR Gold Trust \u2022 Robinhood Token",
+  "symbol": "GLD"
+ },
  "0xcbb95bbf36099d34da091dc6fa6f49efa257cee3": {
   "name": "CleanSpark \u2022 Robinhood Token",
   "symbol": "CLSK"
+ },
+ "0xccee82fe024c36fa15e1005ede3e9e4787e23d09": {
+  "name": "Hims & Hers Health \u2022 Robinhood Token",
+  "symbol": "HIMS"
+ },
+ "0xcef9027c7d6985b85f0ba431125073529a947a68": {
+  "name": "Webull \u2022 Robinhood Token",
+  "symbol": "BULL"
+ },
+ "0xcf364ea52787e289de6f32077834056e3e70d6a8": {
+  "name": "UnitedHealth \u2022 Robinhood Token",
+  "symbol": "UNH"
  },
  "0xcf6b2d875361be807eafa57458c80f28521f9333": {
   "name": "POET Technologies \u2022 Robinhood Token",
@@ -323,9 +659,21 @@
   "name": "Invesco QQQ \u2022 Robinhood Token",
   "symbol": "QQQ"
  },
+ "0xd63abb2c13d7a8421a8017a712802053568e3c1d": {
+  "name": "Schwab US Dividend Equity ETF \u2022 Robinhood Token",
+  "symbol": "SCHD"
+ },
  "0xd917b029c761d264c6a312bbbcda868658ef86a6": {
   "name": "USA Rare Earth \u2022 Robinhood Token",
   "symbol": "USAR"
+ },
+ "0xd95b44124e475743a7589e68f3d74008a5536d44": {
+  "name": "Salesforce \u2022 Robinhood Token",
+  "symbol": "CRM"
+ },
+ "0xdd356aa38f40a7b7076755ac854b6fbb1f0d305b": {
+  "name": "Amkor Technology \u2022 Robinhood Token",
+  "symbol": "AMKR"
  },
  "0xddf2266b79abf0b48898959b0ed6e6adf512be74": {
   "name": "MongoDB \u2022 Robinhood Token",
@@ -347,9 +695,17 @@
   "name": "CrowdStrike Holdings \u2022 Robinhood Token",
   "symbol": "CRWD"
  },
+ "0xeaf2512dfc1beac608f8794b3793cd4e02894aa6": {
+  "name": "Jabil Inc. \u2022 Robinhood Token",
+  "symbol": "JBL"
+ },
  "0xeb30663bdff0622ef4e4e5cbb4e975f19f33f51d": {
   "name": "Futu Holdings \u2022 Robinhood Token",
   "symbol": "FUTU"
+ },
+ "0xeb61c0ed490a367d4e3631ccf8a74b3bfc7e775d": {
+  "name": "Huntington Ingalls \u2022 Robinhood Token",
+  "symbol": "HII"
  },
  "0xec262a75e413fafd0df80480274532c79d42da09": {
   "name": "Strategy Inc. \u2022 Robinhood Token",
@@ -371,13 +727,49 @@
   "name": "UPS \u2022 Robinhood Token",
   "symbol": "UPS"
  },
+ "0xf52597345a8edf418bc4071b4a35112472277d3e": {
+  "name": "Western Digital \u2022 Robinhood Token",
+  "symbol": "WDC"
+ },
  "0xf53f66751b1eff985311b693531e3290f600c410": {
   "name": "Shopify \u2022 Robinhood Token",
   "symbol": "SHOP"
  },
+ "0xf543967eebb6f1917992ef0e68de63ab07a5a0da": {
+  "name": "Cisco Systems \u2022 Robinhood Token",
+  "symbol": "CSCO"
+ },
+ "0xf6290b5e7c26502e2da514c31509849718ea76a5": {
+  "name": "AeroVironment \u2022 Robinhood Token",
+  "symbol": "AVAV"
+ },
+ "0xf6589f11bc40b669e584073f428b05562f568733": {
+  "name": "Snap \u2022 Robinhood Token",
+  "symbol": "SNAP"
+ },
+ "0xf7181b63fdb858558a74ba96bc42732684cd7965": {
+  "name": "Navan \u2022 Robinhood Token",
+  "symbol": "NAVN"
+ },
  "0xf9b46d3d1b22199d4d1025a9cedb540a33f1a2d5": {
   "name": "ExxonMobil Holdings Corporation \u2022 Robinhood Token",
   "symbol": "XOM"
+ },
+ "0xfa78c12e6488814a0262e4e802749a4a737d5fb7": {
+  "name": "Vertiv \u2022 Robinhood Token",
+  "symbol": "VRT"
+ },
+ "0xfaf9cb261b5fcc1f404bb10cd39c5c6c1974e612": {
+  "name": "Advanced Energy \u2022 Robinhood Token",
+  "symbol": "AEIS"
+ },
+ "0xfb2664f07b6aadd29ea7a59d8859b1aeb8645cda": {
+  "name": "UiPath \u2022 Robinhood Token",
+  "symbol": "PATH"
+ },
+ "0xfde6b5d9bb419b10c23268c74e369abff39c0460": {
+  "name": "Red Cat \u2022 Robinhood Token",
+  "symbol": "RCAT"
  },
  "0xff080c8ce2e5feadaca0da81314ae59d232d4afd": {
   "name": "Micron Technology \u2022 Robinhood Token",
