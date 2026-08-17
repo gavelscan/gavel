@@ -1,1 +1,1 @@
-{"addr":"0x87d05966400b6a833d63fa6114dcb4c4fe3f5ee5","n":1,"pool":0,"failed":0,"live":1,"silent":0,"median_lp":0.5,"is_contract":false,"first_block":39095478,"last_block":39095478,"tokens":[{"sym":"OREON","ini":"0x9c0eca2dcfba5d59c9714712408959fe1087cbde","state":"live","ceiling":"PASS"}]}
+{"addr":"0x87d05966400b6a833d63fa6114dcb4c4fe3f5ee5","n":1,"pool":1,"failed":0,"live":0,"silent":0,"median_lp":0.5,"is_contract":false,"first_block":39095478,"last_block":39095478,"tokens":[{"sym":"OREON","ini":"0x9c0eca2dcfba5d59c9714712408959fe1087cbde","state":"pool","ceiling":"PASS"}]}
