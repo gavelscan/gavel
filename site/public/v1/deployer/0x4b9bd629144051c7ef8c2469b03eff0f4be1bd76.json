@@ -1,1 +1,1 @@
-{"addr":"0x4b9bd629144051c7ef8c2469b03eff0f4be1bd76","n":1,"pool":0,"failed":0,"live":1,"silent":0,"median_lp":0.5,"is_contract":false,"first_block":54550199,"last_block":54550199,"tokens":[{"sym":"HOOJA","ini":"0xfeafd1159dd3b9b3ac4f616119773acf6909fdf3","state":"live","ceiling":"FLAG"}]}
+{"addr":"0x4b9bd629144051c7ef8c2469b03eff0f4be1bd76","n":1,"pool":1,"failed":0,"live":0,"silent":0,"median_lp":0.5,"is_contract":false,"first_block":54550199,"last_block":54550199,"tokens":[{"sym":"HOOJA","ini":"0xfeafd1159dd3b9b3ac4f616119773acf6909fdf3","state":"pool","ceiling":"FLAG"}]}
