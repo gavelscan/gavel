@@ -687,6 +687,10 @@
   "name": "Netflix \u2022 Robinhood Token",
   "symbol": "NFLX"
  },
+ "0xe674c5c071821f48bb2d12cadb83617eff438f9e": {
+  "name": "Zeta Global \u2022 Robinhood Token",
+  "symbol": "ZETA"
+ },
  "0xe93237c50d904957cf27e7b1133b510c669c2e74": {
   "name": "Microsoft \u2022 Robinhood Token",
   "symbol": "MSFT"
