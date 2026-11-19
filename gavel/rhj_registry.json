@@ -599,6 +599,10 @@
   "name": "Snowflake \u2022 Robinhood Token",
   "symbol": "SNOW"
  },
+ "0xbbb6c29bcc3a1028a2b54310df73f4f7a3bcb373": {
+  "name": "Anthropic, PBC Class A Common Stock \u2022 Robinhood Token",
+  "symbol": "ANT"
+ },
  "0xbbd09f72b025360fee5c928053dca6248d35be54": {
   "name": "ON Semiconductor \u2022 Robinhood Token",
   "symbol": "ON"
