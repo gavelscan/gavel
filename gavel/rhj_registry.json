@@ -387,6 +387,10 @@
   "name": "Eli Lilly \u2022 Robinhood Token",
   "symbol": "LLY"
  },
+ "0x80e10255a83b257f5a8674d363f547842aa53b8e": {
+  "name": "T. Rowe Price Exchange-Traded Funds, Inc. T. Rowe Price Technology ETF \u2022 Robinhood Token",
+  "symbol": "TTEQ"
+ },
  "0x822cc93ffd030293e9842c30bbd678f530701867": {
   "name": "Bloom Energy \u2022 Robinhood Token",
   "symbol": "BE"
